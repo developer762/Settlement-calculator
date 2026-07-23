@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SettlementCalculator } from "@/components/SettlementCalculator";
 import { cityGuides, getCitiesForState, getCityGuide } from "@/lib/cities";
+import { siteUrl } from "@/lib/site-url";
 
 type CityPageProps = { params: Promise<{ slug: string; city: string }> };
 
@@ -19,7 +20,7 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
 
   const title = `${city.name}, ${city.stateName} Personal Injury Settlement Calculator`;
   const description = `Organize a personal injury settlement estimate for ${city.name}, ${city.stateName}, with documented losses, injury impact, possible fault, and state-law research checks.`;
-  const url = `/states/${city.stateSlug}/${city.slug}/`;
+  const url = `${siteUrl}/states/${city.stateSlug}/${city.slug}/`;
 
   return {
     title,

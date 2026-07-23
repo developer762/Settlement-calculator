@@ -1,8 +1,7 @@
 import type { MetadataRoute } from "next";
 import { states } from "@/lib/states";
 import { cityGuides } from "@/lib/cities";
-
-const siteUrl = "https://settlementcalculator.guide";
+import { siteUrl } from "@/lib/site-url";
 
 export const dynamic = "force-static";
 

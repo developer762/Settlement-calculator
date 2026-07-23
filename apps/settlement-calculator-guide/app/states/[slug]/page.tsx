@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getState, states } from "@/lib/states";
 import { getCitiesForState } from "@/lib/cities";
+import { siteUrl } from "@/lib/site-url";
 import { SettlementCalculator } from "@/components/SettlementCalculator";
 
 type StatePageProps = { params: Promise<{ slug: string }> };
@@ -23,8 +24,8 @@ export async function generateMetadata({ params }: StatePageProps): Promise<Meta
   return {
     title,
     description,
-    alternates: { canonical: `/states/${state.slug}/` },
-    openGraph: { title, description, url: `/states/${state.slug}/`, type: "article" },
+    alternates: { canonical: `${siteUrl}/states/${state.slug}/` },
+    openGraph: { title, description, url: `${siteUrl}/states/${state.slug}/`, type: "article" },
   };
 }
 

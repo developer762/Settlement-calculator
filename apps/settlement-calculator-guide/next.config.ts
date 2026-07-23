@@ -4,8 +4,8 @@ const isGitHubPages = process.env.GITHUB_PAGES === "true";
 
 const nextConfig: NextConfig = {
   output: isGitHubPages ? "export" : undefined,
-  basePath: isGitHubPages ? "/law-tools" : "",
-  assetPrefix: isGitHubPages ? "/law-tools/" : "",
+  basePath: isGitHubPages ? "/settlement-calculator-guide" : "",
+  assetPrefix: isGitHubPages ? "/settlement-calculator-guide/" : "",
   trailingSlash: isGitHubPages,
   images: { unoptimized: true },
   turbopack: { root: process.cwd() },
