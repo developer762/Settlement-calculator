@@ -344,3 +344,543 @@ footer > div { display: flex; justify-content: flex-end; gap: 24px; font-size: 1
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }
+
+/* ==========================================================================
+   INTERACTIVE TABS & MINI-CALCULATORS STYLING
+   ========================================================================== */
+
+/* Factors section vertical tabs */
+.factors-tabs-container {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 0;
+  background: var(--white);
+  border: 1px solid var(--line);
+  box-shadow: 0 15px 50px rgba(16,26,58,.06);
+  margin-top: 40px;
+}
+
+.factors-tab-list {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--line);
+  background: #fafafc;
+}
+
+.factors-tab-button {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 24px 28px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  text-align: left;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.factors-tab-button:last-child {
+  border-bottom: 0;
+}
+
+.factors-tab-button.active {
+  background: var(--white);
+  color: var(--ink);
+  box-shadow: inset 4px 0 0 var(--cobalt);
+}
+
+.factors-tab-button .tab-index {
+  font: 900 13px/1 var(--display);
+  color: var(--cobalt);
+}
+
+.factors-tab-button.active .tab-index {
+  color: var(--cobalt-dark);
+}
+
+.factors-tab-button .tab-title {
+  font: 850 16px/1.2 var(--display);
+  letter-spacing: -.02em;
+}
+
+.factors-tab-button:hover:not(.active) {
+  background: #f0f3fa;
+  color: var(--ink);
+}
+
+.factors-tab-panel {
+  padding: 44px;
+  min-height: 520px;
+  display: flex;
+  flex-direction: column;
+}
+
+.tab-detail-content {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  height: 100%;
+}
+
+.detail-header h3 {
+  margin: 0 0 10px;
+  font: 900 32px/1.1 var(--display);
+  letter-spacing: -.04em;
+  color: var(--ink);
+}
+
+.detail-header p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.stat-card {
+  padding: 20px;
+  background: #f4f6fb;
+  border-left: 3px solid var(--coral);
+}
+
+.stat-card .stat-num {
+  display: block;
+  font: 900 32px/1 var(--display);
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+
+.stat-card .stat-desc {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.compensation-explanation h4,
+.mini-calculator-box h4 {
+  margin: 0 0 10px;
+  font: 850 14px/1 var(--display);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--cobalt-dark);
+}
+
+.compensation-explanation p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: #394362;
+}
+
+.mini-calculator-box {
+  background: #f8f9fd;
+  border: 1px solid var(--line);
+  padding: 28px;
+  margin-top: 10px;
+}
+
+.mini-calc-form {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.mini-calc-form.check-group {
+  gap: 12px;
+}
+
+.calc-row {
+  display: grid;
+  grid-template-columns: 1fr 120px;
+  align-items: center;
+  gap: 15px;
+}
+
+.calc-row label {
+  font-weight: 750;
+  font-size: 13px;
+}
+
+.calc-row input[type="number"],
+.calc-row select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.calc-row input[type="range"] {
+  grid-column: 1 / -1;
+  accent-color: var(--cobalt);
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--cobalt);
+}
+
+.mini-calc-results {
+  border-top: 1px solid var(--line);
+  padding-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.mini-calc-results strong {
+  font-weight: 850;
+  color: var(--ink);
+}
+
+.mini-calc-results .total-highlight {
+  margin-top: 8px;
+  padding: 12px;
+  background: var(--mint);
+  border-left: 4px solid var(--cobalt);
+  font-size: 15px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.mini-calc-results .total-highlight strong {
+  color: var(--cobalt-dark);
+}
+
+/* States section scrollable list & details */
+.states-interactive-container {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 0;
+  margin-top: 40px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  box-shadow: 0 15px 50px rgba(16,26,58,.06);
+}
+
+.states-scroll-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 520px;
+  overflow-y: auto;
+  border-right: 1px solid var(--line);
+  background: #fafafc;
+}
+
+.state-tab-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  text-align: left;
+  transition: all 0.2s ease;
+  width: 100%;
+  cursor: pointer;
+}
+
+.state-tab-btn:last-child {
+  border-bottom: 0;
+}
+
+.state-tab-btn span {
+  font: 750 14px/1.2 var(--display);
+  color: var(--ink);
+}
+
+.state-tab-btn small {
+  color: var(--cobalt);
+  font: 850 10px/1 var(--display);
+  letter-spacing: .08em;
+}
+
+.state-tab-btn.active {
+  background: var(--white);
+  box-shadow: inset 4px 0 0 var(--cobalt);
+}
+
+.state-tab-btn.active span {
+  font-weight: 900;
+}
+
+.state-tab-btn:hover:not(.active) {
+  background: #f0f3fa;
+}
+
+.state-details-panel {
+  padding: 44px;
+  min-height: 520px;
+  display: flex;
+  flex-direction: column;
+}
+
+.state-calc-angle-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.state-calc-angle-content h3 {
+  margin: 0;
+  font: 900 32px/1.1 var(--display);
+  letter-spacing: -.04em;
+  color: var(--ink);
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 12px;
+}
+
+.state-panel-lede {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.state-rules-database {
+  background: #fafafc;
+  border: 1px solid var(--line);
+  padding: 24px;
+}
+
+.state-stats-details {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.state-stat-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12.5px;
+}
+
+.state-stat-row strong {
+  font: 850 11px/1.2 var(--display);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--muted);
+}
+
+.state-stat-row span {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.state-calc-cta {
+  margin-top: 14px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.state-calc-cta p {
+  margin: 0 0 12px;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.state-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--cobalt);
+  color: white;
+  padding: 10px 14px;
+  font-size: 11px;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.state-link-btn:hover {
+  background: var(--cobalt-dark);
+}
+
+.no-state-msg {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+/* FAQ tabs */
+.faq-tabs-container {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 0;
+  margin-top: 40px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  box-shadow: 0 15px 50px rgba(16,26,58,.06);
+}
+
+.faq-tab-list {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--line);
+  background: #fafafc;
+}
+
+.faq-tab-button {
+  padding: 22px 28px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  text-align: left;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.faq-tab-button:last-child {
+  border-bottom: 0;
+}
+
+.faq-tab-button h3 {
+  margin: 0;
+  font: 850 16px/1.3 var(--display);
+  letter-spacing: -.02em;
+}
+
+.faq-tab-button.active {
+  background: var(--white);
+  color: var(--ink);
+  box-shadow: inset 4px 0 0 var(--cobalt);
+}
+
+.faq-tab-button:hover:not(.active) {
+  background: #f0f3fa;
+  color: var(--ink);
+}
+
+.faq-tab-panel {
+  padding: 44px;
+  min-height: 280px;
+  display: flex;
+  align-items: center;
+}
+
+.faq-answer-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.faq-answer-content h3 {
+  margin: 0;
+  font: 900 24px/1.2 var(--display);
+  letter-spacing: -.03em;
+  color: var(--ink);
+}
+
+.faq-answer-content p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14.5px;
+  line-height: 1.7;
+}
+
+.takeaway-card {
+  margin-top: 10px;
+  padding: 16px;
+  background: #fdfae7;
+  border-left: 3px solid var(--signal);
+}
+
+.takeaway-card strong {
+  display: block;
+  font: 850 11px/1.2 var(--display);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: #726210;
+  margin-bottom: 4px;
+}
+
+.takeaway-card p {
+  margin: 0;
+  color: #5c5014;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .factors-tabs-container,
+  .states-interactive-container,
+  .faq-tabs-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .factors-tab-list,
+  .states-scroll-list,
+  .faq-tab-list {
+    flex-direction: row;
+    max-height: none;
+    overflow-x: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    scrollbar-width: thin;
+  }
+  
+  .factors-tab-button,
+  .state-tab-btn,
+  .faq-tab-button {
+    white-space: nowrap;
+    border-bottom: 0;
+    border-right: 1px solid var(--line);
+    padding: 15px 20px;
+    width: auto;
+  }
+  
+  .state-tab-btn {
+    gap: 12px;
+  }
+  
+  .factors-tab-button.active,
+  .state-tab-btn.active,
+  .faq-tab-button.active {
+    box-shadow: inset 0 -4px 0 var(--cobalt);
+  }
+}
+
+@media (max-width: 600px) {
+  .factors-tab-panel,
+  .state-details-panel,
+  .faq-tab-panel {
+    padding: 24px 18px;
+  }
+
+  .calc-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  
+  .calc-row input[type="number"],
+  .calc-row select {
+    width: 100%;
+  }
+}
+
