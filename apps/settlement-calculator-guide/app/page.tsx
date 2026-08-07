@@ -741,21 +741,26 @@ export default function Home() {
       </section>
 
       <section className="section scope-section" aria-labelledby="interpret-heading">
-        <div className="scope-card">
+        <div className="section-heading scope-heading">
           <p className="eyebrow">Information gain</p>
           <h2 id="interpret-heading">How to interpret your settlement estimate</h2>
-          <ol>
-            <li><span>Is every loss supported by a record?</span><small>Replace memory with bills, reports, wage statements, and dates.</small></li>
-            <li><span>Which facts could weaken causation?</span><small>Prior injuries and treatment gaps often need context, not concealment.</small></li>
-            <li><span>What does local law change?</span><small>Check deadlines, comparative fault, caps, and recoverable damages.</small></li>
-            <li><span>What coverage is actually available?</span><small>Identify responsible parties and relevant insurance policies.</small></li>
-          </ol>
         </div>
-        <div className="scope-aside">
-          <span className="scope-stamp">NO LEAD FORM</span>
-          <h3>Your case facts stay in your browser.</h3>
-          <p>This first version sends no calculator inputs to a server and asks for no name, email, or phone number.</p>
-          <button onClick={scrollToCalculator}>Recalculate privately <span>↗</span></button>
+        
+        <div className="scope-layout">
+          <div className="scope-card">
+            <ol>
+              <li><span>Is every loss supported by a record?</span><small>Replace memory with bills, reports, wage statements, and dates.</small></li>
+              <li><span>Which facts could weaken causation?</span><small>Prior injuries and treatment gaps often need context, not concealment.</small></li>
+              <li><span>What does local law change?</span><small>Check deadlines, comparative fault, caps, and recoverable damages.</small></li>
+              <li><span>What coverage is actually available?</span><small>Identify responsible parties and relevant insurance policies.</small></li>
+            </ol>
+          </div>
+          <div className="scope-aside">
+            <span className="scope-stamp">NO LEAD FORM</span>
+            <h3>Your case facts stay in your browser.</h3>
+            <p>This first version sends no calculator inputs to a server and asks for no name, email, or phone number.</p>
+            <button onClick={scrollToCalculator}>Recalculate privately <span>↗</span></button>
+          </div>
         </div>
       </section>
 
