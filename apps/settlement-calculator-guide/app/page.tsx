@@ -786,7 +786,6 @@ export default function Home() {
             ))}
           </div>
 
-          {/* Right side: Selected FAQ Answer */}
           <div className="faq-tab-panel" role="tabpanel">
             {activeFaqTab === 0 && (
               <div className="faq-answer-content">
