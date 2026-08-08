@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { states, type USState } from "@/lib/states";
 import { SettlementCalculator } from "@/components/SettlementCalculator";
@@ -30,8 +30,9 @@ const statisticsData = [
       {
         id: "avg-settlement",
         value: "$30K–$75K",
-        label: "Average settlement amount",
-        explanation: "Typical recovery value drawn from resolved claims — skewed upward by a small share of large cases.",
+        label: "Average personal injury settlement amount",
+        explanation: "communicates typical recovery value drawn from resolved claims.",
+        tooltipText: "Typical payout range across resolved injury claims.",
         icon: (
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="10" />
@@ -44,7 +45,8 @@ const statisticsData = [
         id: "median-settlement",
         value: "≈ $24,000",
         label: "Median settlement amount",
-        explanation: "Communicates the midpoint value across a resolved claim set, reducing distortion from outlier awards.",
+        explanation: "communicates the midpoint value across a resolved claim set, reducing distortion from outlier awards.",
+        tooltipText: "Midpoint value excluding extreme high or low awards.",
         icon: (
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="18" y1="20" x2="18" y2="10" />
@@ -56,8 +58,9 @@ const statisticsData = [
       {
         id: "comp-percentage",
         value: "≈ 95%",
-        label: "Claims resulting in compensation",
-        explanation: "Communicates how often a filed claim ends in payment versus denial or withdrawal.",
+        label: "Percentage of claims resulting in compensation",
+        explanation: "communicates how often a filed claim ends in payment versus denial or withdrawal.",
+        tooltipText: "Share of filed claims resulting in a financial payout.",
         icon: (
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
@@ -69,7 +72,8 @@ const statisticsData = [
         id: "avg-medical",
         value: "$15K–$35K",
         label: "Average medical expenses per claim",
-        explanation: "Communicates typical treatment cost carried across a resolved claim.",
+        explanation: "communicates typical treatment cost carried across a resolved claim.",
+        tooltipText: "Typical medical treatment and ER cost per claim.",
         icon: (
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="10" />
@@ -82,7 +86,8 @@ const statisticsData = [
         id: "avg-wages",
         value: "$4K–$9K",
         label: "Average lost wages per claim",
-        explanation: "Communicates typical missed income tied to a resolved claim.",
+        explanation: "communicates typical missed income tied to a resolved claim.",
+        tooltipText: "Average lost earnings recovered for missed work time.",
         icon: (
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
@@ -94,7 +99,8 @@ const statisticsData = [
         id: "pain-suffering",
         value: "1.5x–5x",
         label: "Typical pain-and-suffering multiplier",
-        explanation: "Communicates the common range applied toward non-economic loss calculation.",
+        explanation: "communicates the common range applied toward non-economic loss calculation.",
+        tooltipText: "Multiplier range applied to medical bills for pain loss.",
         icon: (
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="10" />
@@ -113,7 +119,8 @@ const statisticsData = [
         id: "time-to-settle",
         value: "9–18 months",
         label: "Average time to settle a claim",
-        explanation: "Communicates typical duration from filing toward final resolution.",
+        explanation: "communicates typical duration from filing toward final resolution.",
+        tooltipText: "Standard timeframe from claim filing to payout check.",
         icon: (
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="10" />
@@ -124,8 +131,9 @@ const statisticsData = [
       {
         id: "resolved-no-trial",
         value: "≈ 95%",
-        label: "Resolved without trial",
-        explanation: "Communicates how often a claim closes through negotiation rather than a jury verdict.",
+        label: "Percentage resolved without trial",
+        explanation: "communicates how often a claim closes through negotiation rather than a jury verdict.",
+        tooltipText: "Ratio of claims settled through negotiation vs trial.",
         icon: (
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -138,7 +146,8 @@ const statisticsData = [
         id: "avg-trial-award",
         value: "$150K+",
         label: "Average trial award",
-        explanation: "Communicates typical jury verdict value among cases that proceed toward trial.",
+        explanation: "communicates typical jury verdict value among cases that proceed toward trial.",
+        tooltipText: "Average verdict award for cases that go to trial.",
         icon: (
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="m14 13-8.3 8.3c-.9.9-2.3.9-3.2 0s-.9-2.3 0-3.2L10.8 10" />
@@ -152,7 +161,8 @@ const statisticsData = [
         id: "fee-range",
         value: "33%–40%",
         label: "Attorney fee range",
-        explanation: "Communicates the common contingency percentage charged across resolved claims.",
+        explanation: "communicates the common contingency percentage charged across resolved claims.",
+        tooltipText: "Common legal contingency fee percentage range.",
         icon: (
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="19" y1="5" x2="5" y2="19" />
@@ -170,8 +180,9 @@ const statisticsData = [
       {
         id: "policy-caps",
         value: "≈ 1 in 3",
-        label: "Claims capped by policy limits",
-        explanation: "Communicates how often available coverage caps final settlement value.",
+        label: "Insurance policy limit impact",
+        explanation: "communicates how often available coverage caps final settlement value.",
+        tooltipText: "Frequency where insurance policy limits restrict payout.",
         icon: (
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
@@ -184,7 +195,8 @@ const statisticsData = [
         id: "injury-severity",
         value: "$5K → $250K+",
         label: "Settlement range by injury severity",
-        explanation: "Communicates how value shifts across minor, moderate, plus severe injury categories.",
+        explanation: "communicates how value shifts across minor, moderate, plus severe injury categories.",
+        tooltipText: "Value progression from minor to catastrophic injury.",
         icon: (
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
@@ -197,7 +209,8 @@ const statisticsData = [
         id: "accident-type",
         value: "Varies widely",
         label: "Settlement range by accident type",
-        explanation: "Communicates how value shifts across different incident categories.",
+        explanation: "communicates how value shifts across different incident categories.",
+        tooltipText: "Payout variation across different crash categories.",
         icon: (
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" />
@@ -211,8 +224,9 @@ const statisticsData = [
       {
         id: "fault-reduction",
         value: "Reduced pro rata",
-        label: "Comparative-fault reduction",
-        explanation: "Communicates typical value reduction tied to assigned fault.",
+        label: "Comparative-fault reduction percentage",
+        explanation: "communicates typical value reduction tied to assigned fault.",
+        tooltipText: "Proportional value reduction based on assigned fault.",
         icon: (
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="12" y1="3" x2="12" y2="21" />
@@ -225,8 +239,9 @@ const statisticsData = [
       {
         id: "caps-deadlines",
         value: "TX: 2-yr deadline",
-        label: "State-specific caps & deadlines",
-        explanation: "Communicates jurisdiction specific limits plus filing windows.",
+        label: "State-specific damage caps and deadlines",
+        explanation: "communicates jurisdiction specific limits plus filing windows.",
+        tooltipText: "State damage limits and statutory filing deadlines.",
         icon: (
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
@@ -722,8 +737,775 @@ const customStateTexts: Record<string, { description: string; cities: { name: st
       { name: "Grand Rapids", range: "$37,000 to $80,000" },
       { name: "Ann Arbor", range: "$39,000 to $84,000" }
     ]
+  },
+  MN: {
+    description: "Minnesota accident settlement calculators apply a modified comparative negligence rule barring recovery once assigned fault exceeds 50 percent under state statute. Filing deadline application sets a six year window from an incident date across a standard personal injury claim filed within Minnesota. Damage cap application applies toward specific claim categories under Minnesota's medical malpractice statute. Minneapolis, St. Paul, plus Rochester represent core Minnesota cities carrying claim volume relevant toward venue specific settlement patterns, reviewed through the Minnesota Settlement Calculator.",
+    cities: [
+      { name: "Minneapolis", range: "$45,000 to $94,000" },
+      { name: "St. Paul", range: "$41,000 to $88,000" },
+      { name: "Rochester", range: "$35,000 to $76,000" }
+    ]
+  },
+  MS: {
+    description: "Mississippi accident settlement calculators apply a pure comparative negligence rule, allowing recovery reduced proportionally regardless of an injured party's fault share under state statute. Filing deadline application sets a three year window from an incident date across a standard personal injury claim filed within Mississippi. Damage cap application applies toward non economic loss under Mississippi's medical malpractice statute. Jackson, Gulfport, plus Southaven represent core Mississippi cities carrying claim volume relevant toward venue specific settlement patterns, reviewed through the Mississippi Settlement Calculator.",
+    cities: [
+      { name: "Jackson", range: "$34,000 to $74,000" },
+      { name: "Gulfport", range: "$31,000 to $68,000" },
+      { name: "Southaven", range: "$30,000 to $66,000" }
+    ]
+  },
+  MO: {
+    description: "Missouri accident settlement calculators apply a pure comparative negligence rule, allowing recovery reduced proportionally regardless of an injured party's fault share under state statute. Filing deadline application sets a five year window from an incident date across a standard personal injury claim filed within Missouri. Damage cap application applies toward non economic loss under Missouri's medical malpractice statute. Kansas City, St. Louis, plus Springfield represent core Missouri cities carrying claim volume relevant toward venue specific settlement patterns, reviewed through the Missouri Settlement Calculator.",
+    cities: [
+      { name: "Kansas City", range: "$40,000 to $86,000" },
+      { name: "St. Louis", range: "$42,000 to $90,000" },
+      { name: "Springfield", range: "$33,000 to $72,000" }
+    ]
+  },
+  MT: {
+    description: "Montana accident settlement calculators apply a modified comparative negligence rule barring recovery once assigned fault exceeds 50 percent under state statute. Filing deadline application sets a three year window from an incident date across a standard personal injury claim filed within Montana. A standard vehicle collision claim carries no statutory cap toward compensatory damage under Montana law. Billings, Missoula, plus Great Falls represent core Montana cities carrying claim volume relevant toward venue specific settlement patterns, reviewed through the Montana Settlement Calculator.",
+    cities: [
+      { name: "Billings", range: "$34,000 to $74,000" },
+      { name: "Missoula", range: "$32,000 to $70,000" },
+      { name: "Great Falls", range: "$30,000 to $66,000" }
+    ]
+  },
+  NE: {
+    description: "Nebraska accident settlement calculators apply a modified comparative negligence rule barring recovery once assigned fault reaches 50 percent under state statute. Filing deadline application sets a four year window from an incident date across a standard personal injury claim filed within Nebraska. A standard vehicle collision claim carries no statutory cap toward compensatory damage under Nebraska law. Omaha, Lincoln, plus Bellevue represent core Nebraska cities carrying claim volume relevant toward venue specific settlement patterns, reviewed through the Nebraska Settlement Calculator.",
+    cities: [
+      { name: "Omaha", range: "$38,000 to $82,000" },
+      { name: "Lincoln", range: "$34,000 to $74,000" },
+      { name: "Bellevue", range: "$31,000 to $68,000" }
+    ]
+  },
+  NV: {
+    description: "Nevada accident settlement calculators apply a modified comparative negligence rule barring recovery once assigned fault exceeds 50 percent under state statute. Filing deadline application sets a two year window from an incident date across a standard personal injury claim filed within Nevada. Damage cap application applies toward non economic loss under Nevada's medical malpractice statute. Las Vegas, Reno, plus Henderson represent core Nevada cities carrying claim volume relevant toward venue specific settlement patterns, reviewed through the Nevada Settlement Calculator.",
+    cities: [
+      { name: "Las Vegas", range: "$46,000 to $96,000" },
+      { name: "Reno", range: "$38,000 to $82,000" },
+      { name: "Henderson", range: "$39,000 to $84,000" }
+    ]
+  },
+  NH: {
+    description: "New Hampshire accident settlement calculators apply a modified comparative negligence rule barring recovery once assigned fault exceeds 50 percent under state statute. Filing deadline application sets a three year window from an incident date across a standard personal injury claim filed within New Hampshire. A standard vehicle collision claim carries no statutory cap toward compensatory damage under New Hampshire law. Manchester, Nashua, plus Concord represent core New Hampshire cities carrying claim volume relevant toward venue specific settlement patterns, reviewed through the New Hampshire Settlement Calculator.",
+    cities: [
+      { name: "Manchester", range: "$37,000 to $80,000" },
+      { name: "Nashua", range: "$35,000 to $76,000" },
+      { name: "Concord", range: "$32,000 to $70,000" }
+    ]
+  },
+  NJ: {
+    description: "New Jersey accident settlement calculators apply a modified comparative negligence rule barring recovery once assigned fault exceeds 50 percent under state statute. Filing deadline application sets a two year window from an incident date across a standard personal injury claim filed within New Jersey. A standard vehicle collision claim carries no statutory cap toward compensatory damage under New Jersey law. Newark, Jersey City, plus Trenton represent core New Jersey cities carrying claim volume relevant toward venue specific settlement patterns, reviewed through the New Jersey Settlement Calculator.",
+    cities: [
+      { name: "Newark", range: "$46,000 to $96,000" },
+      { name: "Jersey City", range: "$44,000 to $92,000" },
+      { name: "Trenton", range: "$38,000 to $82,000" }
+    ]
+  },
+  NM: {
+    description: "New Mexico accident settlement calculators apply a pure comparative negligence rule, allowing recovery reduced proportionally regardless of an injured party's fault share under state statute. Filing deadline application sets a three year window from an incident date across a standard personal injury claim filed within New Mexico. A standard vehicle collision claim carries no statutory cap toward compensatory damage under New Mexico law. Albuquerque, Las Cruces, plus Santa Fe represent core New Mexico cities carrying claim volume relevant toward venue specific settlement patterns, reviewed through the New Mexico Settlement Calculator.",
+    cities: [
+      { name: "Albuquerque", range: "$39,000 to $84,000" },
+      { name: "Las Cruces", range: "$32,000 to $70,000" },
+      { name: "Santa Fe", range: "$33,000 to $72,000" }
+    ]
+  },
+  NY: {
+    description: "New York accident settlement calculators apply a pure comparative negligence rule, allowing recovery reduced proportionally regardless of an injured party's fault share under state statute. Filing deadline application sets a three year window from an incident date across a standard personal injury claim filed within New York. A standard vehicle collision claim carries no statutory cap toward compensatory damage under New York law. New York City, Buffalo, plus Rochester represent core New York cities carrying claim volume relevant toward venue specific settlement patterns, reviewed through the New York Settlement Calculator.",
+    cities: [
+      { name: "New York City", range: "$55,000 to $115,000" },
+      { name: "Buffalo", range: "$38,000 to $82,000" },
+      { name: "Rochester", range: "$37,000 to $80,000" }
+    ]
+  },
+  NC: {
+    description: "North Carolina accident settlement calculators apply a pure contributory negligence rule barring recovery once any fault percentage attaches toward an injured party under state statute, with a comparative exception recently added for a vulnerable road user. Filing deadline application sets a three year window from an incident date across a standard personal injury claim filed within North Carolina. A standard vehicle collision claim carries no statutory cap toward compensatory damage under North Carolina law. Charlotte, Raleigh, plus Greensboro represent core North Carolina cities carrying claim volume relevant toward venue specific settlement patterns, reviewed through the North Carolina Settlement Calculator.",
+    cities: [
+      { name: "Charlotte", range: "$43,000 to $90,000" },
+      { name: "Raleigh", range: "$41,000 to $88,000" },
+      { name: "Greensboro", range: "$34,000 to $74,000" }
+    ]
+  },
+  ND: {
+    description: "North Dakota accident settlement calculators apply a modified comparative negligence rule barring recovery once assigned fault reaches 50 percent under state statute. Filing a deadline application sets a six year window from an incident date across a standard personal injury claim filed within North Dakota, longer than the deadline applied across most other states. A standard vehicle collision claim carries no statutory cap toward compensatory damage under North Dakota law. Fargo, Bismarck, plus Grand Forks represent core North Dakota cities carrying claim volume relevant toward venue specific settlement patterns, reviewed through the North Dakota Settlement Calculator.",
+    cities: [
+      { name: "Fargo", range: "$32,000 to $70,000" },
+      { name: "Bismarck", range: "$29,000 to $64,000" },
+      { name: "Grand Forks", range: "$28,000 to $62,000" }
+    ]
+  },
+  OH: {
+    description: "Ohio accident settlement calculators apply a modified comparative negligence rule barring recovery once assigned fault exceeds 50 percent under state statute. Filing deadline application sets a two year window from an incident date across a standard personal injury claim filed within Ohio. Damage cap application applies toward non economic loss under Ohio's statutory limit. Columbus, Cleveland, plus Cincinnati represent core Ohio cities carrying claim volume relevant toward venue specific settlement patterns, reviewed through the Ohio Settlement Calculator.",
+    cities: [
+      { name: "Columbus", range: "$41,000 to $88,000" },
+      { name: "Cleveland", range: "$40,000 to $86,000" },
+      { name: "Cincinnati", range: "$39,000 to $84,000" }
+    ]
+  },
+  OK: {
+    description: "Oklahoma accident settlement calculators apply a modified comparative negligence rule barring recovery once assigned fault exceeds 50 percent under state statute. Filing deadline application sets a two year window from an incident date across a standard personal injury claim filed within Oklahoma. A standard vehicle collision claim carries no statutory cap toward compensatory damage under Oklahoma law. Oklahoma City, Tulsa, plus Norman represent core Oklahoma cities carrying claim volume relevant toward venue specific settlement patterns, reviewed through the Oklahoma Settlement Calculator.",
+    cities: [
+      { name: "Oklahoma City", range: "$37,000 to $80,000" },
+      { name: "Tulsa", range: "$36,000 to $78,000" },
+      { name: "Norman", range: "$31,000 to $68,000" }
+    ]
+  },
+  OR: {
+    description: "Oregon accident settlement calculators apply a modified comparative negligence rule barring recovery once assigned fault exceeds 50 percent under state statute. Filing deadline application sets a two year window from an incident date across a standard personal injury claim filed within Oregon. A standard vehicle collision claim carries no statutory cap toward compensatory damage under Oregon law. Portland, Salem, plus Eugene represent core Oregon cities carrying claim volume relevant toward venue specific settlement patterns, reviewed through the Oregon Settlement Calculator.",
+    cities: [
+      { name: "Portland", range: "$44,000 to $92,000" },
+      { name: "Salem", range: "$34,000 to $74,000" },
+      { name: "Eugene", range: "$35,000 to $76,000" }
+    ]
+  },
+  PA: {
+    description: "Pennsylvania accident settlement calculators apply a modified comparative negligence rule barring recovery once assigned fault exceeds 50 percent under state statute. Filing deadline application sets a two year window from an incident date across a standard personal injury claim filed within Pennsylvania. Damage cap application applies toward specific claim categories under Pennsylvania's medical malpractice statute. Philadelphia, Pittsburgh, plus Allentown represent core Pennsylvania cities carrying claim volume relevant toward venue specific settlement patterns, reviewed through the Pennsylvania Settlement Calculator.",
+    cities: [
+      { name: "Philadelphia", range: "$47,000 to $98,000" },
+      { name: "Pittsburgh", range: "$41,000 to $88,000" },
+      { name: "Allentown", range: "$35,000 to $76,000" }
+    ]
+  },
+  RI: {
+    description: "Rhode Island accident settlement calculators apply a pure comparative negligence rule, allowing recovery reduced proportionally regardless of an injured party's fault share under state statute. Filing deadline application sets a three year window from an incident date across a standard personal injury claim filed within Rhode Island. A standard vehicle collision claim carries no statutory cap toward compensatory damage under Rhode Island law. Providence, Warwick, plus Cranston represent core Rhode Island cities carrying claim volume relevant toward venue specific settlement patterns, reviewed through the Rhode Island Settlement Calculator.",
+    cities: [
+      { name: "Providence", range: "$40,000 to $86,000" },
+      { name: "Warwick", range: "$34,000 to $74,000" },
+      { name: "Cranston", range: "$33,000 to $72,000" }
+    ]
+  },
+  SC: {
+    description: "South Carolina accident settlement calculators apply a modified comparative negligence rule barring recovery once assigned fault exceeds 50 percent under state statute. Filing deadline application sets a three year window from an incident date across a standard personal injury claim filed within South Carolina. A standard vehicle collision claim carries no statutory cap toward compensatory damage under South Carolina law. Columbia, Charleston, plus Greenville represent core South Carolina cities carrying claim volume relevant toward venue specific settlement patterns, reviewed through the South Carolina Settlement Calculator.",
+    cities: [
+      { name: "Columbia", range: "$37,000 to $80,000" },
+      { name: "Charleston", range: "$39,000 to $84,000" },
+      { name: "Greenville", range: "$35,000 to $76,000" }
+    ]
+  },
+  SD: {
+    description: "South Dakota accident settlement calculators apply a slight versus gross negligence rule, allowing recovery only once an injured party's fault registers as slight compared toward a defendant's gross negligence under state statute. Filing deadline application sets a three year window from an incident date across a standard personal injury claim filed within South Dakota. A standard vehicle collision claim carries no statutory cap toward compensatory damage under South Dakota law. Sioux Falls, Rapid City, plus Aberdeen represent core South Dakota cities carrying claim volume relevant toward venue specific settlement patterns, reviewed through the South Dakota Settlement Calculator.",
+    cities: [
+      { name: "Sioux Falls", range: "$33,000 to $72,000" },
+      { name: "Rapid City", range: "$30,000 to $66,000" },
+      { name: "Aberdeen", range: "$27,000 to $60,000" }
+    ]
+  },
+  TN: {
+    description: "Tennessee accident settlement calculators apply a modified comparative negligence rule barring recovery once assigned fault reaches 50 percent under state statute. Filing deadline application sets a one year window from an incident date across a standard personal injury claim filed within Tennessee. Damage cap application applies toward non economic loss under Tennessee's statutory limit. Nashville, Memphis, plus Knoxville represent core Tennessee cities carrying claim volume relevant toward venue specific settlement patterns, reviewed through the Tennessee Settlement Calculator.",
+    cities: [
+      { name: "Nashville", range: "$42,000 to $90,000" },
+      { name: "Memphis", range: "$39,000 to $84,000" },
+      { name: "Knoxville", range: "$34,000 to $74,000" }
+    ]
+  },
+  TX: {
+    description: "Texas accident settlement calculators apply a modified comparative fault rule barring recovery once assigned fault crosses 50 percent under state statute. Filing deadline application sets a two year window from an incident date across a standard personal injury claim filed within Texas. Damage cap application applies toward specific claim categories, medical malpractice claims included under the Texas Medical Liability Act. Houston, Dallas, plus San Antonio represent core Texas cities carrying claim volume relevant toward venue specific settlement patterns, reviewed through the Texas Settlement Calculator.",
+    cities: [
+      { name: "Houston", range: "$48,000 to $100,000" },
+      { name: "Dallas", range: "$46,000 to $96,000" },
+      { name: "San Antonio", range: "$42,000 to $90,000" }
+    ]
+  },
+  UT: {
+    description: "Utah accident settlement calculators apply a modified comparative negligence rule barring recovery once assigned fault reaches 50 percent under state statute. Filing deadline application sets a four year window from an incident date across a standard personal injury claim filed within Utah. A standard vehicle collision claim carries no statutory cap toward compensatory damage under Utah law. Salt Lake City, Provo, plus West Valley City represent core Utah cities carrying claim volume relevant toward venue specific settlement patterns, reviewed through the Utah Settlement Calculator.",
+    cities: [
+      { name: "Salt Lake City", range: "$40,000 to $86,000" },
+      { name: "Provo", range: "$32,000 to $70,000" },
+      { name: "West Valley City", range: "$33,000 to $72,000" }
+    ]
+  },
+  VT: {
+    description: "Vermont accident settlement calculators apply a modified comparative negligence rule barring recovery once assigned fault exceeds 50 percent under state statute. Filing deadline application sets a three year window from an incident date across a standard personal injury claim filed within Vermont. A standard vehicle collision claim carries no statutory cap toward compensatory damage under Vermont law. Burlington, South Burlington, plus Rutland represent core Vermont cities carrying claim volume relevant toward venue specific settlement patterns, reviewed through the Vermont Settlement Calculator.",
+    cities: [
+      { name: "Burlington", range: "$34,000 to $74,000" },
+      { name: "South Burlington", range: "$32,000 to $70,000" },
+      { name: "Rutland", range: "$28,000 to $62,000" }
+    ]
+  },
+  VA: {
+    description: "Virginia accident settlement calculators apply a pure contributory negligence rule barring recovery once any fault percentage attaches toward an injured party under state statute. Filing deadline application sets a two year window from an incident date across a standard personal injury claim filed within Virginia. A standard vehicle collision claim carries no statutory cap toward compensatory damage under Virginia law. Virginia Beach, Richmond, plus Norfolk represent core Virginia cities carrying claim volume relevant toward venue specific settlement patterns, reviewed through the Virginia Settlement Calculator.",
+    cities: [
+      { name: "Virginia Beach", range: "$41,000 to $88,000" },
+      { name: "Richmond", range: "$40,000 to $86,000" },
+      { name: "Norfolk", range: "$37,000 to $80,000" }
+    ]
+  },
+  WA: {
+    description: "Washington accident settlement calculators apply a pure comparative negligence rule, allowing recovery reduced proportionally regardless of an injured party's fault share under state statute. Filing deadline application sets a three year window from an incident date across a standard personal injury claim filed within Washington. A standard vehicle collision claim carries no statutory cap toward compensatory damage under Washington law. Seattle, Spokane, plus Tacoma represent core Washington cities carrying claim volume relevant toward venue specific settlement patterns, reviewed through the Washington Settlement Calculator.",
+    cities: [
+      { name: "Seattle", range: "$49,000 to $102,000" },
+      { name: "Spokane", range: "$37,000 to $80,000" },
+      { name: "Tacoma", range: "$39,000 to $84,000" }
+    ]
+  },
+  WV: {
+    description: "West Virginia accident settlement calculators apply a modified comparative negligence rule barring recovery once assigned fault exceeds the combined fault of all other responsible parties under state statute. Filing deadline application sets a two year window from an incident date across a standard personal injury claim filed within West Virginia. Damage cap application applies toward non economic loss under West Virginia's medical malpractice statute. Charleston, Huntington, plus Morgantown represent core West Virginia cities carrying claim volume relevant toward venue specific settlement patterns, reviewed through the West Virginia Settlement Calculator.",
+    cities: [
+      { name: "Charleston", range: "$34,000 to $74,000" },
+      { name: "Huntington", range: "$30,000 to $66,000" },
+      { name: "Morgantown", range: "$29,000 to $64,000" }
+    ]
+  },
+  WI: {
+    description: "Wisconsin accident settlement calculators apply a modified comparative negligence rule barring recovery once assigned fault exceeds 50 percent under state statute. Filing deadline application sets a three year window from an incident date across a standard personal injury claim filed within Wisconsin. A standard vehicle collision claim carries no statutory cap toward compensatory damage under Wisconsin law. Milwaukee, Madison, plus Green Bay represent core Wisconsin cities carrying claim volume relevant toward venue specific settlement patterns, reviewed through the Wisconsin Settlement Calculator.",
+    cities: [
+      { name: "Milwaukee", range: "$41,000 to $88,000" },
+      { name: "Madison", range: "$38,000 to $82,000" },
+      { name: "Green Bay", range: "$33,000 to $72,000" }
+    ]
+  },
+  WY: {
+    description: "Wyoming accident settlement calculators apply a modified comparative negligence rule barring recovery once assigned fault reaches 50 percent under state statute. Filing deadline application sets a four year window from an incident date across a standard personal injury claim filed within Wyoming. A standard vehicle collision claim carries no statutory cap toward compensatory damage under Wyoming law. Cheyenne, Casper, plus Laramie represent core Wyoming cities carrying claim volume relevant toward venue specific settlement patterns, reviewed through the Wyoming Settlement Calculator.",
+    cities: [
+      { name: "Cheyenne", range: "$32,000 to $70,000" },
+      { name: "Casper", range: "$30,000 to $66,000" },
+      { name: "Laramie", range: "$28,000 to $62,000" }
+    ]
   }
 };
+
+interface FaqTable {
+  headers: string[];
+  rows: string[][];
+}
+
+interface FaqItem {
+  id: string;
+  question: string;
+  text: string;
+  listItems?: { label: string; content: string }[];
+  diagram?: string & {};
+  table?: FaqTable;
+}
+
+interface FaqCategory {
+  id: string;
+  title: string;
+  shortTitle: string;
+  tooltip: string;
+  items: FaqItem[];
+}
+
+const faqCategoryData: FaqCategory[] = [
+  {
+    id: "calc-process",
+    title: "Accident Settlement Calculation Process",
+    shortTitle: "Calculation Process",
+    tooltip: "Overview of economic damage totaling, non-economic multipliers, legal adjustments, and case-specific valuation steps.",
+    items: [
+      {
+        id: "calc-1",
+        question: "How Is Settlement Calculated",
+        text: "Settlement is calculated by evaluating the total economic damages, estimating the value of non-economic damages, and adjusting the result for any applicable legal and case-specific factors. Economic damages include documented medical expenses, lost wages, property damage, and other financial losses resulting from the injury. Non-economic damages, including pain and suffering, are often estimated using methods such as the multiplier or per diem approach when appropriate. Comparative fault, insurance policy limits, available evidence, and other legal factors may increase or reduce the final settlement value depending on the circumstances of the claim.",
+        diagram: "process-diagram-1"
+      },
+      {
+        id: "calc-2",
+        question: "How Is Settlement Value Calculated",
+        text: "Settlement value is calculated by evaluating the total economic damages, estimating the value of non-economic damages, and considering any legal or factual factors that affect the claim. Economic damages include documented medical expenses, lost wages, property damage, and other financial losses resulting from the incident. Non-economic damages are evaluated based on factors including the severity of the injury, the length of recovery, permanent impairment, and the overall impact on the injured person's life, with methods such as the multiplier or per diem approach sometimes used to estimate their value. Comparative fault, insurance policy limits, and other applicable legal factors may reduce or otherwise affect the final settlement value.",
+        diagram: "process-diagram-2"
+      },
+      {
+        id: "calc-3",
+        question: "How Do You Calculate the Settlement Amount for a Claim",
+        text: "Calculate the settlement amount for a claim by determining the total economic damages, estimating the value of non-economic damages, and adjusting the result for any applicable legal or case-specific factors. Economic damages include all verified medical expenses, lost wages, property damage, and other financial losses related to the claim. Non-economic damages are evaluated based on factors including the severity of the injury, the length of recovery, permanent impairment, and the overall impact on the claimant's life, with methods such as the multiplier or per diem approach sometimes used to estimate their value. Comparative fault, insurance policy limits, and other applicable legal factors may reduce or otherwise affect the final settlement amount.",
+        diagram: "process-diagram-3"
+      },
+      {
+        id: "calc-4",
+        question: "How Do I Calculate My Settlement Amount",
+        text: "Calculate your settlement amount by adding your economic damages, estimating your non-economic damages, and adjusting the total for any applicable comparative fault or other legal factors. Economic damages include documented medical expenses, lost wages, property damage, and other financial losses resulting from the incident. Non-economic damages, including pain and suffering, are often estimated using methods such as the multiplier or per diem approach when appropriate. Comparative fault, insurance policy limits, and other case-specific factors may reduce or otherwise affect the estimated settlement value under the applicable state law.",
+        diagram: "process-diagram-4"
+      },
+      {
+        id: "calc-5",
+        question: "How Do Insurance Companies Calculate Settlements",
+        text: "Insurance companies calculate settlements through internal software applying a multiplier toward medical expenses, weighted against liability clarity plus policy limit available. Internal software flags a claim file based on treatment cost, injury code, plus documented lost wage amount. Liability clarity shifts the applied multiplier upward for clear fault cases plus downward for disputed fault cases. Policy limit caps the final offer regardless of calculated value once total damage exceeds available coverage. Adjuster discretion applies past the software output, incorporating litigation risk plus venue history into a final settlement offer.",
+        diagram: "process-diagram-5"
+      }
+    ]
+  },
+  {
+    id: "injury-process",
+    title: "Personal Injury and Accident Settlement Process",
+    shortTitle: "Injury & Accident Process",
+    tooltip: "Specific settlement evaluation workflows across car accidents, personal injury, pain & suffering, slip & fall, and lawyer calculations.",
+    items: [
+      {
+        id: "inj-1",
+        question: "How Are Car Accident Settlements Calculated",
+        text: "Car accident settlements are calculated through economic damage totaling, multiplier application toward non-economic loss, plus fault-based reduction connected to a specific collision. Vehicle damage estimate, medical billing, plus wage loss verification supply the economic damage base. Multiplier selection reflects injury severity documented across the treatment period following the collision. Fault reduction applies a percentage tied to responsibility assigned toward each involved driver under state law.",
+        diagram: "process-diagram-inj1"
+      },
+      {
+        id: "inj-2",
+        question: "How Are Personal Injury Settlements Calculated",
+        text: "Personal injury settlements are calculated through the same layered process applied across every injury claim type, totaling economic damage before applying a severity multiplier plus fault reduction. Economic damage totals medical expenses, lost wages, plus property damage costs connected to a specific incident. Severity multiplier application shifts non-economic value based on injury type, recovery duration, plus lasting impairment. Fault reduction lowers the combined figure based on the percentage of responsibility assigned under applicable state law.",
+        diagram: "process-diagram-inj2"
+      },
+      {
+        id: "inj-3",
+        question: "How to Calculate Pain and Suffering Settlement",
+        text: "To calculate a pain and suffering settlement, follow the four steps. First, determine the total economic damages, including medical expenses, lost income, and other documented financial losses. Second, evaluate the severity of the injury, the length of recovery, and any permanent impairment supported by the medical evidence. Third, estimate the value of pain and suffering using an appropriate method, such as the multiplier method or the per diem method, when applicable. Lastly, compare the estimate with the facts of the case, available evidence, and any factors that may affect settlement negotiations before determining the potential settlement value.",
+        diagram: "process-diagram-inj3"
+      },
+      {
+        id: "inj-4",
+        question: "How Are Slip and Fall Settlements Calculated",
+        text: "Slip plus fall settlements are calculated through economic damage totaling, severity multiplier application, plus fault-based reduction connected to premises liability law. Economic damage totals medical expenses plus lost wage amount documented following a fall incident. Premises liability evidence, such as a maintenance record plus hazard notice history among examples, shapes liability clarity applied during negotiation. Comparative fault reduction applies once a property owner argues partial responsibility carried by the injured party.",
+        diagram: "process-diagram-inj4"
+      },
+      {
+        id: "inj-5",
+        question: "How Do Lawyers Calculate Settlement Value After an Accident",
+        text: "Lawyers calculate settlement value after an accident through case history review, documented damage totaling, plus negotiation leverage assessment tied to liability clarity. Case history review compares similar resolved claims toward a realistic value range presented to a client. Documented damage totaling combines every verified economic loss connected to the incident. Negotiation leverage assessment weighs liability clarity, policy limit, plus litigation risk carried by an insurance carrier before presenting a demand figure.",
+        diagram: "process-diagram-inj5"
+      }
+    ]
+  },
+  {
+    id: "wc-process",
+    title: "Workers Compensation Settlement Process",
+    shortTitle: "Workers Comp Process",
+    tooltip: "Evaluation steps across average weekly wage, impairment rating, disability benefits, and California-specific workers' comp settlement rules.",
+    items: [
+      {
+        id: "wc-1",
+        question: "How Are Workers Comp Settlements Calculated",
+        text: "Workers comp settlements are calculated through average weekly wage determination, impairment rating assessment, plus benefit schedule application connected to a specific state system. Average weekly wage determination totals earnings across a set period before the injury date. Impairment rating assessment assigns a percentage tied to permanent functional loss confirmed through medical evaluation. Benefit schedule application multiplies the impairment percentage through a state-set benefit table, producing a settlement figure",
+        diagram: "process-diagram-wc1"
+      },
+      {
+        id: "wc-2",
+        question: "How to Calculate Workers Comp Settlement",
+        text: "To calculate a workers' comp settlement, follow the four steps. First, determine the workers' compensation benefits available under the applicable state law. Second, gather the medical records, wage information, and any disability or impairment ratings that affect the claim. Third, evaluate future medical expenses, lost earning capacity, and any remaining benefits that may influence the settlement value. Lastly, compare the estimated settlement with the available benefits and applicable state laws before deciding whether to settle the claim.",
+        diagram: "process-diagram-wc2"
+      },
+      {
+        id: "wc-3",
+        question: "How Is Workers' Comp Settlement Calculated",
+        text: "Workers' comp settlement is calculated by evaluating the injured worker's average weekly wage, the severity of the injury, applicable disability or impairment ratings when required, available benefits under state law, and other factors that affect the value of the claim. The average weekly wage determines the amount of wage replacement benefits available under the applicable workers' compensation system. An impairment or disability rating, when applicable, measures the extent of any permanent loss resulting from the injury. State workers' compensation laws and benefit schedules determine how those factors affect the potential settlement, along with future medical expenses and other case-specific considerations.",
+        diagram: "process-diagram-wc3"
+      },
+      {
+        id: "wc-4",
+        question: "How to Calculate Settlement From Workers Compensation",
+        text: "To calculate a settlement from workers' compensation, follow the four steps. First, identify the workers' compensation benefits available under the applicable state law, including medical benefits, income benefits, and any impairment-related benefits. Second, gather documentation supporting the claim, including medical records, wage information, and any impairment rating assigned by the treating physician when applicable. Third, determine whether future medical expenses, disputed issues, or other case-specific factors affect the potential settlement value. Lastly, evaluate the proposed settlement against the available benefits and the long-term impact of the injury before deciding whether to resolve the claim.",
+        diagram: "process-diagram-wc4"
+      },
+      {
+        id: "wc-5",
+        question: "How to Calculate a Workers Comp Settlement in California",
+        text: "To calculate a workers comp settlement in California, follow the four steps. First, determine the permanent disability rating assigned after reaching maximum medical improvement. Second, calculate the permanent disability benefits using the applicable California benefit rate and the disability rating established under California's workers' compensation system. Third, consider additional factors that may affect the settlement, including future medical care, temporary disability benefits, age, occupation, and apportionment when applicable. Lastly, determine whether the settlement will be resolved through a Compromise and Release or a Stipulated Award before estimating the total settlement value.",
+        diagram: "process-diagram-wc5"
+      }
+    ]
+  },
+  {
+    id: "definitions",
+    title: "Definitions",
+    shortTitle: "Definitions",
+    tooltip: "Key legal terms, damage types, economic vs non-economic differences, demand letters, and policy limit explanations.",
+    items: [
+      {
+        id: "def-1",
+        question: "What Is a Personal Injury Settlement?",
+        text: "A personal injury settlement is a negotiated agreement resolving a claim through compensation paid toward an injured party absent a trial verdict. Settlement terms typically release the paying party from further liability connected to the specific incident once payment is completed. Negotiation moves through demand letter submission, counteroffer exchange, plus final agreement toward a specific figure. Settlement avoids trial cost, delay, plus outcome uncertainty carried by a jury verdict. Sutliff & Stout negotiates settlement terms toward a filed claim pursued on behalf of an injured client across Houston."
+      },
+      {
+        id: "def-2",
+        question: "What Are Damages in a Personal Injury Case?",
+        text: "The damages in a personal injury case are listed below.",
+        listItems: [
+          {
+            label: "Economic Damages",
+            content: "Economic damages cover verifiable financial loss connected to a specific incident, including medical expenses and lost income among the core components. Documentation through billing statements plus pay records supports economic damage calculation. Economic damage totals form the base figure applied during settlement calculation."
+          },
+          {
+            label: "Non-Economic Damages",
+            content: "Non-economic damages cover subjective loss connected to pain, suffering, plus reduced quality of life following an injury. Multiplier or per diem method application converts non-economic impact into a calculated figure. Non-economic damage value shifts based on injury severity plus recovery duration."
+          },
+          {
+            label: "Punitive Damages",
+            content: "Punitive damages punish conduct rising past ordinary negligence, tied to reckless or intentional misconduct proven during trial. Punitive damage claims require a higher evidentiary threshold compared to a standard negligence claim. Punitive damage awards remain rare compared to standard compensatory recovery within a personal injury case."
+          }
+        ]
+      },
+      {
+        id: "def-3",
+        question: "What Is the Difference Between Economic and Non-Economic Damages?",
+        text: "The difference between economic and non-economic damages is that economic damages compensate for measurable financial losses, while non-economic damages compensate for intangible losses that do not have a fixed monetary value. Economic damages are supported by verifiable financial records, including medical bills, lost wage documentation, property repair invoices, and other financial records showing the actual cost of the injury. Non-economic damages compensate for physical pain, emotional distress, mental anguish, loss of enjoyment of life, and other intangible effects of the injury. Settlement estimates often consider methods such as the multiplier or per diem approach when evaluating non-economic damages, although the appropriate valuation depends on the facts of the case.\n\nThe distinction below outlines core differences reviewed during a claim assessment.",
+        table: {
+          headers: ["Category", "Economic Damages", "Non-Economic Damages"],
+          rows: [
+            ["Basis", "Verifiable financial record", "Subjective impact assessment"],
+            ["Documentation", "Billing statement, pay stub, invoice", "Medical narrative, treatment duration"],
+            ["Calculation Method", "Direct total from records", "Multiplier or per diem application"],
+            ["Cap Application", "Rarely capped under a standard claim", "Capped within specific claim categories under a jurisdiction applying a statutory limit"]
+          ]
+        }
+      },
+      {
+        id: "def-4",
+        question: "What Does Pain and Suffering Mean in a Settlement?",
+        text: "Pain and suffering in a settlement means the non-economic damages awarded for the physical pain, emotional distress, and reduced quality of life resulting from an injury. These damages are commonly estimated using methods such as the multiplier method or the per diem method, depending on the facts of the case. The severity of the injury, the length of recovery, permanent impairment, and the overall impact on daily life all influence the amount awarded for pain and suffering. Medical records, treatment notes, personal journals, mental health records, and testimony from the injured person help support a claim for pain and suffering during settlement negotiations. Sutliff & Stout presents evidence of both economic and non-economic damages when negotiating compensation with insurance companies."
+      },
+      {
+        id: "def-5",
+        question: "What Is a Settlement Demand Letter?",
+        text: "A settlement demand letter is a formal document presenting a requested compensation figure to an insurance carrier connected to a filed claim. The letter outlines liability argument, documented damage total, plus supporting evidence connected to the incident. A demand figure typically sits above the anticipated settlement value, allowing negotiation room toward a final agreed figure. Insurance carriers respond through a counteroffer, opening a negotiation exchange toward final resolution. Sutliff & Stout drafts demand letters supported through complete documentation connected to a filed claim."
+      },
+      {
+        id: "def-6",
+        question: "What Does Policy Limit Mean in an Injury Claim?",
+        text: "Policy limit in an injury claim means the maximum amount an insurance company will pay under a particular insurance policy for a covered claim, regardless of whether the injured person's damages exceed that amount. A liability policy limit caps the compensation available from the at-fault party's insurance once proven damages exceed the available coverage. Underinsured motorist (UIM) coverage may provide additional compensation when the at-fault driver's liability insurance is insufficient, and the injured person carries applicable UIM coverage. Confirming the available policy limits early in the claim helps shape settlement negotiations and expectations. Sutliff & Stout investigates available insurance coverage and policy limits when evaluating a client's potential recovery."
+      }
+    ]
+  },
+  {
+    id: "concepts",
+    title: "Concepts",
+    shortTitle: "Concepts",
+    tooltip: "Core legal concepts including multiplier method, per diem approach, comparative vs contributory negligence, subrogation, and earning capacity.",
+    items: [
+      {
+        id: "con-1",
+        question: "What Is the Multiplier Method in Settlement Calculation?",
+        text: "The Multiplier Method in settlement calculation is a common approach for estimating pain and suffering by multiplying a person's economic damages by a number that reflects the severity of the injury. Minor injuries generally receive a lower multiplier, while severe or permanent injuries may justify a higher multiplier depending on the facts of the case. Factors including the length of recovery, the extent of medical treatment, permanent impairment, and the overall impact of the injury influence the multiplier selected. Sutliff & Stout evaluates these factors along with the available evidence to determine the full value of a personal injury claim rather than relying on a single calculation method."
+      },
+      {
+        id: "con-2",
+        question: "What Is the Per Diem Method for Calculating Pain and Suffering?",
+        text: "The Per Diem method for calculating pain and suffering is a damages calculation approach that assigns a daily monetary value to a person's pain and suffering and multiplies that amount by the number of days the injury affects the person's life. The daily value is often based on a reasonable amount supported by the facts of the case and, in some situations, may reference the injured person's daily earnings. The recovery period generally runs from the date of the injury until maximum medical improvement or the end of treatment, depending on the circumstances. The per diem method is commonly used when the injury has a clearly defined recovery period, while the multiplier method is more often applied when the effects of the injury are less predictable or longer lasting."
+      },
+      {
+        id: "con-3",
+        question: "What Is Comparative Negligence and How Does It Work?",
+        text: "Comparative negligence is a legal rule reducing compensation based on a percentage of fault assigned to an injured party during a claim. A jury or adjuster assigns a fault percentage toward each involved party based on evidence reviewed during the claim. Compensation reduces proportionally, so a twenty percent fault assignment reduces total value by twenty percent. Texas applies a modified version barring recovery entirely once assigned fault crosses fifty percent under state statute. Sutliff & Stout challenges fault percentage assigned toward a client, presenting evidence supporting a lower determination."
+      },
+      {
+        id: "con-4",
+        question: "What Is Contributory Negligence?",
+        text: "Contributory negligence is a stricter legal rule barring recovery entirely once an injured party carries any percentage of fault connected to an incident. A small number of jurisdictions retain this rule, contrasting against the comparative fault approach applied within Texas. Under contributory negligence, even minimal fault assigned toward an injured party eliminates compensation regardless of the other party's greater fault share. Texas does not apply contributory negligence, applying a modified comparative rule instead."
+      },
+      {
+        id: "con-5",
+        question: "What Is Subrogation in a Personal Injury Settlement?",
+        text: "Subrogation in a personal injury settlement is the legal right of an insurance company or benefit provider to recover the money it paid for accident-related expenses from a later settlement or court award. Health insurers and workers' compensation carriers commonly assert subrogation rights after paying medical expenses or wage-related benefits. Reimbursement of valid subrogation claims reduces the injured person's net recovery unless the amount is negotiated or otherwise reduced. Negotiating a reduction in subrogation claims can increase the client's final settlement proceeds before distribution. Sutliff & Stout works to identify, evaluate, and negotiate valid subrogation claims before finalizing a client's settlement."
+      },
+      {
+        id: "con-6",
+        question: "What Is Loss of Earning Capacity?",
+        text: "Loss of earning capacity is a damage category covering reduced future income ability connected to a lasting injury impact. This category differs from lost wages. Lost wages cover missed work already incurred. Earning capacity covers diminished future potential connected to a lasting impairment. Vocational expert testimony often supports earning capacity valuation connected to a permanent impairment case. Sutliff & Stout pursues earning capacity valuation connected to a filed claim involving permanent impairment."
+      }
+    ]
+  },
+  {
+    id: "process",
+    title: "Process",
+    shortTitle: "Process",
+    tooltip: "How calculators work, negotiating with insurance companies, demand letter to payout timeline, adjuster scoring, and post-acceptance steps.",
+    items: [
+      {
+        id: "proc-1",
+        question: "How Does a Personal Injury Settlement Calculator Work?",
+        text: "A personal injury settlement calculator works through input collection, formula application, plus range output presented for a specific claim. Input collection gathers medical expense total, lost wage amount, injury severity level, plus fault percentage connected to the incident. Formula application totals economic damage, applies a severity multiplier, then reduces the combined figure through the entered fault percentage. Range output presents a low figure plus a high figure reflecting documentation strength plus negotiation variability. Sutliff & Stout reviews calculator output alongside case-specific evidence before presenting a client with a realistic expectation."
+      },
+      {
+        id: "proc-2",
+        question: "How Is a Settlement Amount Negotiated With the Insurance Company?",
+        text: "The settlement amount is negotiated with the insurance company through the exchange of a settlement demand, supporting evidence, and counteroffers until the parties reach an agreement or decide to proceed with litigation. A demand letter outlines the facts of the case, supporting evidence, damages, and the amount requested to resolve the claim. The insurance company reviews the demand and may accept it, reject it, or respond with a counteroffer, leading to further negotiations. The outcome depends on factors including liability, the strength of the evidence, the extent of the injuries, the available insurance coverage, and the potential risks of going to trial. Sutliff & Stout negotiates with insurance companies to pursue fair compensation based on the facts and evidence supporting each client's claim."
+      },
+      {
+        id: "proc-3",
+        question: "How Does a Claim Move From Demand Letter to Settlement Payout?",
+        text: "A claim moves from demand letter to settlement payout through counteroffer exchange, agreement confirmation, plus release document execution. Counteroffer exchange continues until both parties reach a figure acceptable for final resolution. Agreement confirmation locks the final figure through a written settlement agreement signed by both parties. Release document execution formally closes the claim, releasing the paying party from further liability connected to the incident. Payout follows release execution, typically arriving through a check or electronic transfer processed by the insurer."
+      },
+      {
+        id: "proc-4",
+        question: "When Should I Use a Settlement Calculator During My Claim?",
+        text: "You should use a settlement calculator during your claim after you have gathered basic information about your injuries, medical expenses, lost income, and other damages to obtain a general estimate of your claim's potential value. Using a calculator after the initial stages of treatment provides a more reliable estimate because additional medical records and financial documentation become available. Updating the information improves the estimate as treatment continues and damages change. A settlement calculator does not replace a legal evaluation because liability, insurance coverage, future damages, and other case-specific factors affect the final settlement value. Sutliff & Stout recommends discussing the facts of a claim with an attorney to better understand its potential value before accepting a settlement."
+      },
+      {
+        id: "proc-5",
+        question: "How Do Insurance Adjusters Calculate Their Settlement Offers?",
+        text: "Insurance adjusters calculate settlement offers through internal software scoring, weighted against liability clarity plus documented damage total. Software scoring flags a claim file based on treatment cost, injury code, plus lost wage amount entered into the system. Liability clarity shifts the applied multiplier upward for clear fault cases plus downward for disputed fault cases. Adjuster discretion applies past the software output, incorporating litigation risk plus venue history into a final number. Initial offers commonly open below calculated value, anticipating a counteroffer exchange toward final resolution."
+      },
+      {
+        id: "proc-6",
+        question: "What Happens After I Accept a Settlement Offer?",
+        text: "The insurance company prepares a settlement release for your signature, processes the agreed payment, and closes the claim once all required documents and deductions are completed after you accept a settlement offer. The settlement release confirms the agreed compensation and releases the responsible party from further liability related to the claim. Signing the release generally prevents additional claims arising from the same incident. Payment is typically issued after the signed release is returned, although the exact timing depends on the insurance company's processing procedures and the resolution of any valid medical liens or subrogation claims. Sutliff & Stout reviews settlement agreements and release documents with clients before they are signed to help protect their legal interests."
+      }
+    ]
+  },
+  {
+    id: "requirements",
+    title: "Requirements",
+    shortTitle: "Requirements",
+    tooltip: "Documentary requirements for medical expenses, lost wage proof, police reports, liability evidence, and legal review necessity.",
+    items: [
+      {
+        id: "req-1",
+        question: "What Information Do I Need to Use a Settlement Calculator?",
+        text: "Medical expenses, lost income, information about your injuries, and details of the accident are the primary information needed to use a settlement calculator. Medical expense documentation includes itemized bills and insurance Explanation of Benefits (EOBs) for treatment related to the injury. Lost income documentation includes pay stubs, tax records, or employer verification showing wages lost because of the accident. Information about the injuries includes the diagnosis, medical treatment received, recovery period, and any permanent impairment. Accident details, including the police report, witness statements, photographs, and other liability evidence, help produce a more accurate estimate when evaluating the claim. Sutliff & Stout reviews this information to provide a more comprehensive assessment of a claim's potential value."
+      },
+      {
+        id: "req-2",
+        question: "What Documents Prove My Medical Expenses?",
+        text: "Itemized medical bills, medical records, insurance Explanation of Benefits (EOBs), and payment receipts are the primary documents that prove medical expenses in a personal injury claim. Itemized medical bills identify the cost of each procedure, medication, and healthcare service received. Medical records link those expenses to the injuries caused by the accident and document the treatment provided. Insurance Explanation of Benefits statements show the amounts billed, paid by the insurer, and any remaining patient responsibility. Payment receipts verify out-of-pocket expenses incurred by the injured person. Complete documentation from every healthcare provider strengthens the calculation of economic damages during settlement negotiations. Sutliff & Stout collects and reviews these records to support the full value of a client's claim."
+      },
+      {
+        id: "req-3",
+        question: "How Do I Prove Lost Wages for a Settlement Claim?",
+        text: "Proving lost wages requires pay stub comparison, an employer verification letter, plus tax filing connected to the missed work period. Pay stub comparison contrasts earnings before the incident against reduced or absent earnings following the incident. An employer verification letter confirms missed work dates plus standard pay rate connected to the position. Self-employed claimants supply a profit and loss statement plus tax filing covering a comparable period before plus after the incident. Complete wage documentation strengthens economic damage totaling presented during negotiation."
+      },
+      {
+        id: "req-4",
+        question: "Do I Need a Police Report to Calculate My Settlement?",
+        text: "Yes, a police report supports settlement calculation through documented fault determination plus incident detail confirmed at the scene. A police report records vehicle position, damage extent, plus witness statements gathered immediately following a collision. Insurance carriers weigh police report content heavily during liability determination connected to a filed claim. Absent a police report, liability proof relies more heavily on photograph evidence, witness statements, plus physical damage assessment gathered independently. Sutliff & Stout requests a police report copy early within a filed claim connected to liability proof."
+      },
+      {
+        id: "req-5",
+        question: "What Evidence Increases the Accuracy of a Settlement Estimate?",
+        text: "Medical records, proof of lost income, and evidence establishing liability increase the accuracy of a settlement estimate by providing documentation that supports the value of a personal injury claim. Complete medical records reduce uncertainty when evaluating the severity of injuries and calculating damages. Verified proof of lost income improves the accuracy of economic damage calculations. Clear liability evidence, including accident reports, witness statements, photographs, and other supporting documentation, strengthens the assessment of fault and the potential settlement value. Sutliff & Stout reviews all available evidence before providing an informed estimate of a claim's potential value."
+      },
+      {
+        id: "req-6",
+        question: "Do I Need a Lawyer to Calculate My Settlement Value?",
+        text: "No, you do not need a lawyer to calculate your settlement value, but legal representation helps produce a more accurate estimate based on the specific facts of your case. A settlement calculator provides a general estimate using standard inputs but cannot account for case-specific factors such as disputed liability, insurance coverage limits, future damages, or the strength of the available evidence. A lawyer evaluates those factors to determine the full value of a claim and develop an effective negotiation strategy. Complex claims involving severe injuries, disputed fault, or multiple insurance policies benefit significantly from a professional legal review before a settlement demand is made. Sutliff & Stout offers free consultations to review the facts of a case and explain the factors that may affect its potential value."
+      }
+    ]
+  },
+  {
+    id: "factors",
+    title: "Factors",
+    shortTitle: "Factors",
+    tooltip: "Key factors affecting settlement value including severity, fault, pre-existing conditions, future medical costs, and state law variances.",
+    items: [
+      {
+        id: "fact-1",
+        question: "What Factors Increase a Personal Injury Settlement Amount?",
+        text: "The factors that increase a personal injury settlement amount are listed below.",
+        listItems: [
+          {
+            label: "Injury Severity",
+            content: "Injury severity increases settlement value through a higher applied multiplier connected to lasting impairment or extended recovery. Permanent impairment plus disfigurement carry a higher multiplier compared to a fully resolved soft tissue injury. Documented severity through imaging plus specialist evaluation strengthens the applied multiplier during calculation."
+          },
+          {
+            label: "Clear Liability",
+            content: "Clear liability increases settlement value through reduced litigation risk carried by an insurance carrier during negotiation. A rear-end collision or a clearly documented hazard often carries stronger liability clarity compared to a disputed intersection incident. Clear liability shortens the negotiation timeline. Clear liability also supports a stronger initial demand figure."
+          },
+          {
+            label: "Strong Documentation",
+            content: "Strong documentation increases settlement value through complete medical records, income proof, plus liability evidence presented during negotiation. Consistent treatment record across the full recovery period removes causation doubt raised during adjuster review. Complete documentation shortens negotiation timeline through reduced back-and-forth evidence requests."
+          },
+          {
+            label: "High Policy Limit",
+            content: "A high policy limit increases the settlement value ceiling connected to the paying party's available coverage. A commercial vehicle policy often carries a higher limit compared to a standard personal auto policy. Confirming every available coverage layer, umbrella coverage included, raises the achievable settlement ceiling."
+          }
+        ]
+      },
+      {
+        id: "fact-2",
+        question: "How Does Injury Severity Affect the Settlement Value?",
+        text: "Injury severity affects settlement value through multiplier selection applied to the non-economic damage calculation. A minor injury resolving within weeks applies a multiplier near the low end of a standard range. A severe or permanent injury applies a multiplier near the high end of a standard range, reflecting lasting impact on daily function. Recovery duration, treatment intensity, plus permanent impairment rating each shift multiplier selection within the standard range. Sutliff & Stout documents severity thoroughly to support a stronger multiplier position during negotiation."
+      },
+      {
+        id: "fact-3",
+        question: "How Does Being Partially at Fault Reduce My Settlement?",
+        text: "Partial fault reduces settlement value through a proportional deduction tied to the assigned fault percentage under comparative negligence law. A twenty-five percent fault assignment reduces total calculated value by twenty-five percent before final payout. Texas bars recovery entirely once assigned fault crosses fifty percent under the modified comparative rule applied statewide. Evidence challenging the assigned fault percentage can shift the reduction downward, raising net settlement value. Sutliff & Stout challenges fault percentage assignment toward minimizing reduction applied against a client's settlement."
+      },
+      {
+        id: "fact-4",
+        question: "Do Pre-Existing Conditions Lower My Settlement Amount?",
+        text: "Yes, a pre-existing condition can lower settlement amount once an insurer argues current symptoms predate the incident rather than resulting from it. Medical documentation distinguishing aggravation from origin protects value tied to the specific incident. A previously stable condition worsened through a new incident still supports compensation tied to the aggravation itself. Absent clear distinguishing documentation, an insurer often discounts value tied toward the disputed portion of the injury. Sutliff & Stout gathers prior medical record comparisons to isolate aggravation value connected to a filed claim."
+      },
+      {
+        id: "fact-5",
+        question: "How Do Future Medical Costs Affect the Calculation?",
+        text: "Future medical costs affect the calculation through an added projection layered onto documented past medical expenses connected to a specific claim. A treating physician's projection estimates ongoing treatment, therapy, or surgical need connected to the injury. Projected cost calculation often relies on life care planning connected to a permanent or catastrophic injury case. Adding future costs raises the economic damage base, indirectly raising the non-economic multiplier calculation applied afterward. Sutliff & Stout secures physician projection documentation before finalizing a settlement demand involving ongoing care needs."
+      },
+      {
+        id: "fact-6",
+        question: "Does the State I Live In Change My Settlement Value?",
+        text: "Yes, the governing state changes settlement value through comparative fault threshold, damage cap application, plus filing deadline specific to that jurisdiction. A state applying a strict fault threshold bars recovery sooner compared to a state applying a more lenient threshold. A state applying a damage cap toward non-economic loss limits recovery regardless of injury severity within specific claim categories. Filing deadline variance across state law shifts urgency connected to evidence gathering plus claim submission timing. Sutliff & Stout applies Texas-specific statute knowledge toward every filed claim reviewed across Houston."
+      }
+    ]
+  },
+  {
+    id: "costs",
+    title: "Costs and Deductions",
+    shortTitle: "Costs & Deductions",
+    tooltip: "Lawyer contingency fees, medical liens, subrogation, taxability of settlements, and calculating net payout.",
+    items: [
+      {
+        id: "cost-1",
+        question: "How Much Do Personal Injury Lawyers Take From a Settlement?",
+        text: "Personal injury lawyers commonly take a contingency fee percentage ranging from one-third to forty percent of a final settlement figure. A lower percentage often applies once a case resolves early through negotiation absent litigation filing. A higher percentage often applies once a case proceeds past litigation filing toward trial preparation or trial itself. Fee agreement terms confirmed before representation begins set the exact percentage applied toward the final figure. Sutliff & Stout confirms fee structure clearly through a written agreement before beginning representation connected to a filed claim."
+      },
+      {
+        id: "cost-2",
+        question: "What Is a Contingency Fee and How Is It Calculated?",
+        text: "A contingency fee is a payment arrangement tying attorney compensation directly to a percentage of the final settlement or trial award. Calculation multiplies the agreed percentage by the gross settlement figure before deducting case expenses. A case resolving through early negotiation often carries a lower percentage compared to a case proceeding through trial. Absent recovery, a contingency arrangement typically requires no attorney fee payment from the client. Sutliff & Stout structures contingency fee agreements clearly before beginning representation connected to a filed claim."
+      },
+      {
+        id: "cost-3",
+        question: "What Are Medical Liens and How Do They Reduce My Payout?",
+        text: "Medical liens reduce a final payout once a healthcare provider or insurer asserts reimbursement rights connected to a settlement.\n\nThe categories below outline common lien types reviewed before final payout distribution.",
+        listItems: [
+          {
+            label: "Hospital Lien",
+            content: "A hospital lien asserts reimbursement rights connected to treatment costs provided following an incident. State law often sets a specific process a hospital follows toward asserting a valid lien. Negotiating a hospital lien reduction increases net payout received by an injured party."
+          },
+          {
+            label: "Health Insurance Subrogation",
+            content: "Health insurance subrogation asserts reimbursement rights connected to medical payments made on behalf of an injured party. Federal or state law shapes the possibility connected to a subrogation claim asserted by a private insurer. Negotiated subrogation reduction increases net value received following lien resolution."
+          },
+          {
+            label: "Medicare or Medicaid Lien",
+            content: "A Medicare or Medicaid lien asserts reimbursement rights connected to government-funded treatment provided following an incident. Federal formula application often reduces the asserted lien amount based on attorney fees plus case expense proportion. Timely reporting to the governing agency prevents penalties connected to delayed lien resolution."
+          }
+        ]
+      },
+      {
+        id: "cost-4",
+        question: "Is a Personal Injury Settlement Taxable?",
+        text: "No, compensation connected to physical injury within a personal injury settlement remains non-taxable under federal tax law under standard circumstances. Compensatory damages covering medical expenses plus physical injury impacts fall outside taxable income under federal statute. Punitive damage awards plus interest accrued during litigation remain taxable regardless of the underlying claim type. Emotional distress compensation absent an accompanying physical injury can carry taxable treatment under specific circumstances. Sutliff & Stout reviews settlement structure toward minimizing taxable exposure before finalizing a final agreement."
+      },
+      {
+        id: "cost-5",
+        question: "What Is My Net Payout After Fees and Deductions?",
+        text: "Your net payout after fees and deductions equals the total settlement or court award minus the attorney's contingency fee, reimbursed case expenses, and any valid medical liens or subrogation claims that must be paid. The attorney's contingency fee is calculated according to the written contingency fee agreement, while case expenses may be deducted either before or after the fee calculation, depending on the terms of that agreement. Reimbursable expenses commonly include filing fees, expert witness fees, deposition costs, and medical record retrieval expenses. Any valid liens or subrogation claims are then resolved before the remaining funds are distributed. Sutliff & Stout provides clients with a clear explanation of fees, costs, and deductions before finalizing a settlement."
+      },
+      {
+        id: "cost-6",
+        question: "Who Pays the Court Costs in a Personal Injury Case?",
+        text: "The representing law firm typically advances court costs in a personal injury case under a contingency fee agreement, with those costs reimbursed from the final settlement or court award if the case is successful. Advanced costs include filing fees, deposition expenses, expert witness fees, and medical record retrieval costs related to case preparation. Reimbursement occurs before the client's final net recovery is calculated and is deducted along with the attorney's contingency fee. Sutliff & Stout works on a contingency fee basis, meaning clients pay no upfront legal fees and owe attorney fees only if compensation is recovered."
+      }
+    ]
+  },
+  {
+    id: "timelines",
+    title: "Timelines",
+    shortTitle: "Timelines",
+    tooltip: "Timeframes for settlement payout, negotiation duration, statute of limitations, release payout timing, trial impact, and pre-treatment calculations.",
+    items: [
+      {
+        id: "time-1",
+        question: "How Long Does It Take to Receive a Settlement After an Accident?",
+        text: "Receiving a settlement after an accident typically takes between 3 months and 18 months, depending on the complexity of the claim, the severity of the injuries, and whether the case settles or proceeds to litigation. A clear liability case supported by complete documentation often resolves near the shorter end of that timeframe. A disputed liability case or a case involving extended medical treatment often resolves near the longer end. Litigation extends the timeline further because court scheduling and the discovery process add additional steps beyond standard settlement negotiations. Sutliff & Stout manages client expectations throughout the settlement process for claims pursued across Houston."
+      },
+      {
+        id: "time-2",
+        question: "How Long Do Settlement Negotiations Usually Last?",
+        text: "Settlement negotiations usually last between 1 and 6 months, depending on the complexity of the claim, the completeness of the supporting documentation, and whether liability is disputed. A complete demand package supported by clear liability often shortens negotiations toward the earlier end of that timeframe. A disputed liability case or a case awaiting final medical treatment often extends negotiations toward the later end. Insurer response times and multiple rounds of counteroffers also increase the overall negotiation period. Sutliff & Stout pursues efficient negotiations while working to secure the full value of every claim."
+      },
+      {
+        id: "time-3",
+        question: "What Is the Statute of Limitations for a Personal Injury Claim?",
+        text: "The statute of limitations for a personal injury claim is generally two years from the date of the injury under Texas law. Missing the filing deadline typically prevents a claim from moving forward regardless of injury severity or liability clarity. Certain claim types, including claims against government entities, carry shorter notice deadlines that require much faster action. Deadline calculations can change under the discovery rule when an injury is not reasonably discovered until a later date. Sutliff & Stout tracks filing deadlines closely for every claim handled across Houston."
+      },
+      {
+        id: "time-4",
+        question: "How Long After Signing the Release Do I Get Paid?",
+        text: "Payout after signing a settlement release typically arrives within 2 to 6 weeks, although the exact timeline depends on the insurance company's processing time and whether any medical liens or other claims must be resolved before payment is issued. A straightforward claim without outstanding liens often pays near the shorter end of that timeframe. A claim awaiting subrogation or lien resolution often pays near the longer end of the timeframe. Electronic payment processing typically arrives faster than receiving a mailed check. Sutliff & Stout tracks payout timing closely following every signed release connected to a client."
+      },
+      {
+        id: "time-5",
+        question: "Does Going to Trial Make the Payout Take Longer?",
+        text: "Yes, proceeding toward trial extends payout timing considerably compared to a claim resolved through negotiation. Court scheduling, discovery exchange, plus trial preparation each add process steps absent in a negotiated resolution. A jury verdict can also trigger a post-trial appeal period further delaying final payout. Settlement negotiation avoids this extended timeline, often resolving within a shorter window compared to litigation. Sutliff & Stout weighs timeline impact alongside value potential before recommending trial pursuit connected to a filed claim."
+      },
+      {
+        id: "time-6",
+        question: "Can I Calculate My Settlement Before Treatment Is Finished?",
+        text: "Yes, an early settlement calculation remains possible before treatment finishes, though accuracy improves once treatment reaches a stable endpoint. An early calculation relies on projected treatment cost plus anticipated recovery duration absent a final medical release. Accepting a final settlement before treatment completion risks undervaluing ongoing or future medical need. Waiting toward maximum medical improvement typically produces a more accurate final calculation supported through complete documentation. Sutliff & Stout balances early expectation setting alongside a recommendation toward waiting before finalizing a demand figure."
+      }
+    ]
+  },
+  {
+    id: "comparisons",
+    title: "Comparisons",
+    shortTitle: "Comparisons",
+    tooltip: "Side-by-side comparisons of calculator vs lawyer estimates, settling vs trial, multiplier vs per diem, state laws, and minor vs severe injuries.",
+    items: [
+      {
+        id: "comp-1",
+        question: "Which Is More Accurate, a Settlement Calculator or a Lawyer Estimate?",
+        text: "A settlement calculator applies standard formula logic absent jurisdiction-specific nuance. A lawyer estimate applies case-specific legal review connected to a filed claim, incorporating nuance a standard formula cannot capture. Calculator output supplies a fast, general range useful early within a claim before full evidence gathering completes. Lawyer estimate accuracy improves through evidence review, negotiation experience, plus jurisdiction-specific statute knowledge applied toward the specific claim.\n\nThe table below outlines core differences reviewed during a settlement value assessment.",
+        table: {
+          headers: ["Category", "Settlement Calculator", "Lawyer Estimate"],
+          rows: [
+            ["Basis", "Standard formula logic", "Case-specific legal review"],
+            ["Speed", "Instant output", "Requires case review time"],
+            ["Nuance", "Limited to entered figures", "Incorporates liability nuance plus venue history"],
+            ["Accuracy Over Time", "Static absent new input", "Improves as evidence plus negotiation progress"]
+          ]
+        }
+      },
+      {
+        id: "comp-2",
+        question: "Which Pays More, Settling vs Going to Trial?",
+        text: "Settling typically resolves faster compared to trial, though trial can produce a higher award once liability plus damage proof reach a strong threshold. Settlement avoids trial cost, delay, plus outcome uncertainty carried by a jury verdict. Trial pursuit risks a lower award or complete denial once a jury reaches an unfavorable conclusion.\n\nThe comparison below outlines core tradeoffs reviewed before choosing a resolution path.",
+        table: {
+          headers: ["Category", "Settlement", "Trial"],
+          rows: [
+            ["Speed", "Faster resolution", "Extended timeline through court process"],
+            ["Certainty", "Guaranteed figure once signed", "Uncertain outcome tied to jury decision"],
+            ["Cost", "Lower litigation expense", "Higher expense through trial preparation"],
+            ["Ceiling", "Capped near negotiated figure", "Potentially higher through jury award"]
+          ]
+        }
+      },
+      {
+        id: "comp-3",
+        question: "Which Should I Use, Multiplier Method vs Per Diem Method?",
+        text: "Multiplier method selection suits an injury carrying lasting impairment or a less defined recovery timeline. Per diem method selection suits an injury carrying a clear, countable recovery timeline supported through defined treatment duration. Method choice shifts the calculated non-economic figure meaningfully depending on injury type plus documentation available.\n\nThe comparison below outlines when each method applies effectively.",
+        table: {
+          headers: ["Category", "Multiplier Method", "Per Diem Method"],
+          rows: [
+            ["Best Fit", "Lasting or severe impairment", "Clear, countable recovery timeline"],
+            ["Calculation Basis", "Economic damage times severity figure", "Daily value times recovery days"],
+            ["Documentation Need", "Severity plus impairment record", "Defined treatment start plus end date"],
+            ["Common Use", "Long-term or permanent injury claims", "Short term, clearly bounded injury claims"]
+          ]
+        }
+      },
+      {
+        id: "comp-4",
+        question: "How Big Is the Gap First Insurance Offer vs Final Settlement?",
+        text: "The gap separating a first insurance offer plus final settlement often ranges wide, since an initial offer commonly opens well below documented claim value. Strong documentation plus firm negotiation typically close this gap, raising the final figure well past the opening offer. A weak or incomplete claim file often closes less of this gap, settling nearer the initial offer. Litigation filing can widen the eventual gap further once trial risk pressures an insurer toward a higher figure. Sutliff & Stout negotiates aggressively toward closing this gap connected to a filed claim pursued across Houston."
+      },
+      {
+        id: "comp-5",
+        question: "How Do Settlement Amounts Differ Between States?",
+        text: "Settlement amounts differ across states through comparative fault threshold, damage cap application, plus venue-specific jury verdict history. A state applying a strict fault threshold bars recovery sooner compared to a state applying a lenient threshold. A state applying a damage cap toward non-economic loss limits recovery regardless of injury severity within specific claim categories. Venue history connected to local jury verdict patterns also shifts insurer settlement behavior across different jurisdictions.\n\nThe comparison below outlines core state-level variables reviewed during a cross-state assessment.",
+        table: {
+          headers: ["Category", "Stricter Fault State", "Lenient Fault State"],
+          rows: [
+            ["Fault Threshold", "Bars recovery at a lower fault percentage", "Bars recovery at a higher fault percentage or not at all"],
+            ["Damage Cap", "May apply toward specific claim categories", "Cap application varies by category plus jurisdiction"],
+            ["Venue History", "Shapes insurer settlement behavior locally", "Shapes insurer settlement behavior locally"],
+            ["Filing Deadline", "Set by individual state statute", "Set by individual state statute"]
+          ]
+        }
+      },
+      {
+        id: "comp-6",
+        question: "What Is the Value Difference Between Minor Injury vs Severe Injury Settlements?",
+        text: "Minor injury settlements carry a lower non-economic multiplier compared to severe injury settlements, reflecting reduced recovery duration plus lasting impact. A minor injury resolving within a short recovery window applies a multiplier near the low end of a standard range. A severe injury involving permanent impairment applies a multiplier near the high end of a standard range, raising total settlement value substantially. Economic damage totals also differ, since severe injury cases often carry extended treatment costs plus future medical projections.\n\nThe comparison below outlines core value drivers separating minor from severe injury settlements.",
+        table: {
+          headers: ["Category", "Minor Injury", "Severe Injury"],
+          rows: [
+            ["Multiplier Range", "Lower end of standard range", "Higher end of standard range"],
+            ["Recovery Duration", "Shorter, often weeks", "Extended, often months or permanent"],
+            ["Economic Damage", "Limited medical plus wage loss", "Extensive medical, future care, plus lost earning capacity"],
+            ["Negotiation Complexity", "Lower, often resolved quickly", "Higher, often requires expert testimony"]
+          ]
+        }
+      }
+    ]
+  }
+];
 
 export default function Home() {
   // Tabs State
@@ -739,6 +1521,66 @@ export default function Home() {
   const [isFactorsDescExpanded, setIsFactorsDescExpanded] = useState(false);
   const [isInterpretDescExpanded, setIsInterpretDescExpanded] = useState(false);
   const [isStatesDescExpanded, setIsStatesDescExpanded] = useState(false);
+
+  // New FAQ Redesign State
+  const [activeFaqCategoryTab, setActiveFaqCategoryTab] = useState(0);
+  const [activeFaqCategoryTooltip, setActiveFaqCategoryTooltip] = useState<{ text: string; x: number; y: number } | null>(null);
+  const [activeFaqItemId, setActiveFaqItemId] = useState<string | null>("calc-1");
+  const [readMoreFaqItems, setReadMoreFaqItems] = useState<Record<string, boolean>>({});
+  const faqTabsRef = useRef<HTMLDivElement>(null);
+
+  const handleFaqCategoryTabChange = (idx: number) => {
+    setActiveFaqCategoryTab(idx);
+    const firstItemId = faqCategoryData[idx]?.items[0]?.id || null;
+    setActiveFaqItemId(firstItemId);
+  };
+
+  const handleFaqTabMouseEnter = (e: React.MouseEvent, tooltipText: string) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const container = faqTabsRef.current?.parentElement;
+    const containerRect = container?.getBoundingClientRect();
+    if (containerRect) {
+      let x = rect.left - containerRect.left + rect.width / 2;
+      const y = rect.top - containerRect.top;
+
+      // Clamp X position to prevent mobile viewport overflow
+      const tooltipHalfWidth = Math.min(130, containerRect.width / 2 - 10);
+      const minX = tooltipHalfWidth + 10;
+      const maxX = containerRect.width - tooltipHalfWidth - 10;
+      x = Math.max(minX, Math.min(maxX, x));
+
+      setActiveFaqCategoryTooltip({ text: tooltipText, x, y });
+    }
+  };
+
+  const toggleFaqCategoryTooltip = (e: React.MouseEvent, tooltipText: string) => {
+    e.stopPropagation();
+    if (activeFaqCategoryTooltip) {
+      setActiveFaqCategoryTooltip(null);
+    } else {
+      handleFaqTabMouseEnter(e, tooltipText);
+    }
+  };
+
+  const handleFaqTabMouseLeave = () => {
+    setActiveFaqCategoryTooltip(null);
+  };
+
+  const scrollFaqTabs = (direction: "left" | "right") => {
+    if (faqTabsRef.current) {
+      const scrollAmount = direction === "left" ? -250 : 250;
+      faqTabsRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
+    }
+  };
+
+  const toggleFaqAccordion = (itemId: string) => {
+    setActiveFaqItemId((prev) => (prev === itemId ? null : itemId));
+  };
+
+  const toggleFaqReadMore = (itemId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setReadMoreFaqItems((prev) => ({ ...prev, [itemId]: !prev[itemId] }));
+  };
 
   const prevMethodSlide = () => {
     setActiveMethodSlide((prev) => (prev === 0 ? methodologySlides.length - 1 : prev - 1));
@@ -775,14 +1617,15 @@ export default function Home() {
     setExpandedCards((prev) => ({ ...prev, [cardKey]: !prev[cardKey] }));
   };
 
-  useEffect(() => {
+  const handleAccidentTabChange = (tabId: string) => {
+    setActiveAccidentTab(tabId);
     setExpandedCards({});
-    const defaults = defaultValuesByTab[activeAccidentTab] || { medical: 9000, wages: 3000, severity: "moderate" };
+    const defaults = defaultValuesByTab[tabId] || { medical: 9000, wages: 3000, severity: "moderate" };
     setAccMedical(defaults.medical);
     setAccWages(defaults.wages);
     setAccSeverity(defaults.severity);
     setAccFault(10);
-  }, [activeAccidentTab]);
+  };
 
   const scrollAccidentTabs = (direction: "left" | "right") => {
     const container = document.getElementById("accident-tabs-container");
@@ -1035,6 +1878,20 @@ export default function Home() {
             <div className="stats-cards-grid">
               {group.items.map((item) => (
                 <div key={item.id} className="stat-card">
+                  <button 
+                    type="button" 
+                    className="stat-info-icon-btn" 
+                    aria-label={`Info about ${item.label}`}
+                  >
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="12" y1="16" x2="12" y2="12" />
+                      <line x1="12" y1="8" x2="12.01" y2="8" />
+                    </svg>
+                  </button>
+                  <div className="stat-tooltip-bubble">
+                    {item.tooltipText || item.explanation}
+                  </div>
                   <div className="stat-icon">{item.icon}</div>
                   <div className="stat-value">{item.value}</div>
                   <div className="stat-label">{item.label}</div>
@@ -1095,7 +1952,7 @@ export default function Home() {
                   role="tab"
                   aria-selected={activeAccidentTab === tab.id}
                   className={`accident-tab-button ${activeAccidentTab === tab.id ? "active" : ""}`}
-                  onClick={() => setActiveAccidentTab(tab.id)}
+                  onClick={() => handleAccidentTabChange(tab.id)}
                   onMouseEnter={(e) => handleTabMouseEnter(e, tab.id)}
                   onMouseLeave={handleTabMouseLeave}
                 >
@@ -2269,24 +3126,8 @@ export default function Home() {
                           {descriptionText}
                         </p>
                         
-                        <div className="state-stats-details">
-                          <div className="state-stat-row">
-                            <strong>Statute of Limitations (Filing Deadline)</strong>
-                            <span>{stateStats.deadline}</span>
-                          </div>
-                          <div className="state-stat-row">
-                            <strong>Shared Fault (Negligence Standard)</strong>
-                            <span>{stateStats.rule}</span>
-                          </div>
-                          <div className="state-stat-row">
-                            <strong>Damage Limitation Caps</strong>
-                            <span>{stateStats.caps}</span>
-                          </div>
-                          <div className="state-stat-row">
-                            <strong>Specific Statutory Limits</strong>
-                            <span>{stateStats.limitText}</span>
-                          </div>
-                        </div>
+
+
 
                         {customStateTexts[selectedState.code]?.cities && (
                           <div className="state-cities-section">
@@ -2328,69 +3169,829 @@ export default function Home() {
           <h2 id="faq-heading">Frequently asked questions about settlement calculators</h2>
         </div>
         
-        <div className="faq-tabs-container">
-          {/* Left side: FAQ list as vertical tabs */}
-          <div className="faq-tab-list" role="tablist" aria-label="FAQ Questions">
-            {[
-              "Is this settlement estimate accurate?",
-              "Why does the calculator give a range?",
-              "How are pain and suffering damages estimated?",
-              "Does selecting a state apply that state’s settlement law?"
-            ].map((question, idx) => (
-              <button
-                key={idx}
-                role="tab"
-                aria-selected={activeFaqTab === idx}
-                className={`faq-tab-button ${activeFaqTab === idx ? "active" : ""}`}
-                onClick={() => setActiveFaqTab(idx)}
-              >
-                <h3>{question}</h3>
-              </button>
-            ))}
+        {/* Horizontal Navigation Tabs with Info Icon & Tooltip */}
+        <div className="faq-tabs-nav-wrapper">
+          <button
+            type="button"
+            className="tabs-scroll-btn left"
+            onClick={() => scrollFaqTabs("left")}
+            aria-label="Scroll FAQ tabs left"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+          </button>
+
+          <div className="faq-tabs-scroll-container" ref={faqTabsRef}>
+            <div className="faq-tabs-row" role="tablist" aria-label="FAQ Categories">
+              {faqCategoryData.map((cat, idx) => (
+                <button
+                  key={cat.id}
+                  role="tab"
+                  aria-selected={activeFaqCategoryTab === idx}
+                  className={`faq-horizontal-tab-btn ${activeFaqCategoryTab === idx ? "active" : ""}`}
+                  onClick={() => handleFaqCategoryTabChange(idx)}
+                  onMouseEnter={(e) => handleFaqTabMouseEnter(e, cat.tooltip)}
+                  onMouseLeave={handleFaqTabMouseLeave}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="4" y="2" width="16" height="20" rx="2" ry="2"/>
+                    <line x1="8" y1="6" x2="16" y2="6"/>
+                    <line x1="16" y1="14" x2="16" y2="18"/>
+                    <path d="M16 10h.01M12 10h.01M8 10h.01M12 14h.01M8 14h.01M12 18h.01M8 18h.01"/>
+                  </svg>
+                  <span>{cat.title}</span>
+                  <svg 
+                    className="tab-button-info-icon" 
+                    width="13" 
+                    height="13" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="2.5" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                    onClick={(e) => toggleFaqCategoryTooltip(e, cat.tooltip)}
+                  >
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="16" x2="12" y2="12"/>
+                    <line x1="12" y1="8" x2="12.01" y2="8"/>
+                  </svg>
+                </button>
+              ))}
+            </div>
           </div>
 
-          <div className="faq-tab-panel" role="tabpanel">
-            {activeFaqTab === 0 && (
-              <div className="faq-answer-content">
-                <h3>Is this settlement estimate accurate?</h3>
-                <p>It is a planning model, not a prediction. It uses the values you provide and a disclosed impact range. Evidence, insurance, jurisdiction, negotiation, and many case-specific facts can produce a materially different outcome.</p>
-                <div className="takeaway-card">
-                  <strong>Key Takeaway:</strong>
-                  <p>Use the calculator to understand the components of value, not to predict a final checkout amount.</p>
-                </div>
+          <button
+            type="button"
+            className="tabs-scroll-btn right"
+            onClick={() => scrollFaqTabs("right")}
+            aria-label="Scroll FAQ tabs right"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </button>
+
+          {activeFaqCategoryTooltip && (
+            <div
+              className="tab-portal-tooltip"
+              style={{
+                left: `${activeFaqCategoryTooltip.x}px`,
+                top: `${activeFaqCategoryTooltip.y - 8}px`
+              }}
+            >
+              {activeFaqCategoryTooltip.text}
+              <div className="tab-portal-tooltip-arrow" />
+            </div>
+          )}
+        </div>
+
+        {/* Tab Items Container */}
+        <div className="faq-items-list">
+          {faqCategoryData[activeFaqCategoryTab]?.items.map((item, idx) => {
+            const isOpen = activeFaqItemId === item.id;
+            const isReadMore = !!readMoreFaqItems[item.id];
+            
+            // Sentence split for preview
+            const sentences = item.text.split(". ");
+            const previewText = sentences[0] + (sentences.length > 1 ? "." : "");
+
+            return (
+              <div key={item.id} className={`faq-item-card ${isOpen ? "open" : ""}`}>
+                <button
+                  type="button"
+                  className="faq-item-header"
+                  onClick={() => toggleFaqAccordion(item.id)}
+                  aria-expanded={isOpen}
+                >
+                  {idx === 0 ? (
+                    <h2>{item.question}</h2>
+                  ) : (
+                    <h3>{item.question}</h3>
+                  )}
+                  <span className="faq-toggle-icon">{isOpen ? "−" : "+"}</span>
+                </button>
+
+                {isOpen && (
+                  <div className="faq-item-body">
+                    <p className="faq-preview-text">
+                      {isReadMore ? item.text : previewText}
+                    </p>
+
+                    {(item.text.length > previewText.length || item.table || item.listItems || item.diagram) && (
+                      <button
+                        type="button"
+                        className="faq-readmore-btn"
+                        onClick={(e) => toggleFaqReadMore(item.id, e)}
+                      >
+                        {isReadMore ? "Read less ▴" : "Read more ▾"}
+                      </button>
+                    )}
+
+                    {/* Responsive Table rendering for items with table data */}
+                    {isReadMore && item.table && (
+                      <div className="faq-table-wrapper">
+                        <table className="faq-responsive-table">
+                          <thead>
+                            <tr>
+                              {item.table.headers.map((header, hIdx) => (
+                                <th key={hIdx}>{header}</th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {item.table.rows.map((row, rIdx) => (
+                              <tr key={rIdx}>
+                                {row.map((cell, cIdx) => (
+                                  <td key={cIdx} data-label={item.table?.headers[cIdx]}>{cell}</td>
+                                ))}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+
+                    {/* Bullet List rendering for items with listItems */}
+                    {isReadMore && item.listItems && (
+                      <ul className="faq-bullet-list">
+                        {item.listItems.map((li, lIdx) => (
+                          <li key={lIdx}>
+                            <strong>{li.label}: </strong>{li.content}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+
+                    {/* Show Diagram Image box when Read More is active */}
+                    {isReadMore && item.diagram === "process-diagram-1" && (
+                      <div className="faq-diagram-card dark-theme">
+                        <h4 className="faq-diagram-title">Settlement Calculation Process</h4>
+                        <div className="faq-diagram-flow">
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box">
+                              <div className="faq-step-icon">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
+                              </div>
+                              <span>Calculate Economic Damages</span>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box">
+                              <div className="faq-step-icon">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                              </div>
+                              <span>Estimate Non-economic Damages</span>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box">
+                              <div className="faq-step-icon">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m14 13 5 5M6 6l5 5M4 11l4-4M13 20l4-4M15 4l5 5"/></svg>
+                              </div>
+                              <span>Apply Legal Adjustments</span>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box highlight">
+                              <div className="faq-step-icon">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="m9 15 2 2 4-4"/></svg>
+                              </div>
+                              <span>Final Settlement Value</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {isReadMore && item.diagram === "process-diagram-2" && (
+                      <div className="faq-diagram-card dark-theme alt-bg">
+                        <h4 className="faq-diagram-title">Settlement Value Calculation Process</h4>
+                        <div className="faq-diagram-flow">
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box simple">
+                              <span>Calculate Economic Damages</span>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box simple">
+                              <span>Estimate Non-Economic Damages</span>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box simple">
+                              <span>Apply Legal Adjustments</span>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box simple highlight">
+                              <span>Final Settlement Value</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {isReadMore && item.diagram === "process-diagram-3" && (
+                      <div className="faq-diagram-card dark-theme alt-bg-2">
+                        <h4 className="faq-diagram-title">Settlement Amount Calculation Process</h4>
+                        <div className="faq-diagram-bracket-flow">
+                          <div className="faq-bracket-left-col">
+                            <div className="faq-step-box simple">
+                              <span>Calculate Economic Damages</span>
+                            </div>
+                            <div className="faq-step-box simple">
+                              <span>Estimate Non-Economic Damages</span>
+                            </div>
+                          </div>
+                          <div className="faq-bracket-symbol">
+                            <svg width="24" height="84" viewBox="0 0 24 84" fill="none" stroke="#ff6b52" strokeWidth="2.5">
+                              <path d="M4 6 C16 6, 16 22, 16 42 C16 62, 16 78, 4 78 M16 42 L24 42" strokeLinecap="round" />
+                            </svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box simple">
+                              <span>Apply Legal Adjustments</span>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box simple highlight">
+                              <span>Final Settlement Amount</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {isReadMore && item.diagram === "process-diagram-4" && (
+                      <div className="faq-diagram-card dark-theme alt-bg-2">
+                        <h4 className="faq-diagram-title">Settlement Amount Calculation Process</h4>
+                        <div className="faq-diagram-bracket-flow">
+                          <div className="faq-bracket-left-col">
+                            <div className="faq-step-box blue-theme">
+                              <div className="faq-step-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00b4d8" strokeWidth="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
+                              </div>
+                              <span>Calculate Economic Damages</span>
+                            </div>
+                            <div className="faq-step-box blue-theme">
+                              <div className="faq-step-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00b4d8" strokeWidth="2"><path d="m14 13 5 5M6 6l5 5M4 11l4-4M13 20l4-4M15 4l5 5"/></svg>
+                              </div>
+                              <span>Estimate Non-Economic Damages</span>
+                            </div>
+                          </div>
+                          <div className="faq-bracket-symbol">
+                            <svg width="24" height="84" viewBox="0 0 24 84" fill="none" stroke="#00b4d8" strokeWidth="2.5">
+                              <path d="M4 6 C16 6, 16 22, 16 42 C16 62, 16 78, 4 78 M16 42 L24 42" strokeLinecap="round" />
+                            </svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme">
+                              <div className="faq-step-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00b4d8" strokeWidth="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="8" y1="6" x2="16" y2="6"/><path d="M16 14h.01M12 14h.01M8 14h.01M12 18h.01M8 18h.01"/></svg>
+                              </div>
+                              <span>Calculate Total Damages</span>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme">
+                              <div className="faq-step-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00b4d8" strokeWidth="2"><path d="m14 13 5 5M6 6l5 5M4 11l4-4M13 20l4-4M15 4l5 5"/></svg>
+                              </div>
+                              <span>Apply Legal Adjustments</span>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme highlight">
+                              <div className="faq-step-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00b4d8" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="m9 15 2 2 4-4"/></svg>
+                              </div>
+                              <span>Final Settlement Amount</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {isReadMore && item.diagram === "process-diagram-5" && (
+                      <div className="faq-staircase-card">
+                        <h4 className="faq-staircase-title">Insurance Settlement Process</h4>
+                        <div className="faq-staircase-steps-wrapper">
+                          <div className="stair-step-item step-green">
+                            <span>Final Offer</span>
+                          </div>
+                          <div className="stair-step-item step-pink">
+                            <span>Adjuster Discretion</span>
+                          </div>
+                          <div className="stair-step-item step-red">
+                            <span>Policy Limit Check</span>
+                          </div>
+                          <div className="stair-step-item step-orange">
+                            <span>Liability Assessment</span>
+                          </div>
+                          <div className="stair-step-item step-yellow">
+                            <span>Claim Flagging</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {isReadMore && item.diagram === "process-diagram-inj1" && (
+                      <div className="faq-diagram-card dark-theme alt-bg-2">
+                        <h4 className="faq-diagram-title">Car Accident Settlement Calculation</h4>
+                        <div className="faq-diagram-flow">
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme">
+                              <span>Calculate Economic Damages</span>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme rounded-pill">
+                              <span>Apply Multiplier</span>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme">
+                              <span>Apply Fault Reduction</span>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme rounded-oval highlight">
+                              <span>Final Settlement</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {isReadMore && item.diagram === "process-diagram-inj2" && (
+                      <div className="faq-diagram-card dark-theme alt-bg-2">
+                        <h4 className="faq-diagram-title">Personal Injury Settlement Calculation Process</h4>
+                        <div className="faq-diagram-flow">
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme">
+                              <div className="faq-step-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00b4d8" strokeWidth="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/></svg>
+                              </div>
+                              <span>Calculate Economic Damages</span>
+                              <p className="faq-step-subtext">Sum medical expenses, lost wages, and property damage costs.</p>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme">
+                              <div className="faq-step-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00b4d8" strokeWidth="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
+                              </div>
+                              <span>Apply Severity Multiplier</span>
+                              <p className="faq-step-subtext">Adjust non-economic value based on injury type, recovery duration, and lasting impairment.</p>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme">
+                              <div className="faq-step-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00b4d8" strokeWidth="2"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+                              </div>
+                              <span>Apply Fault Reduction</span>
+                              <p className="faq-step-subtext">Lower the total based on percentage of responsibility under state law.</p>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme rounded-oval highlight">
+                              <div className="faq-step-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00b4d8" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="m9 15 2 2 4-4"/></svg>
+                              </div>
+                              <span>Final Settlement Amount</span>
+                              <p className="faq-step-subtext">The resulting monetary value of the injury claim.</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {isReadMore && item.diagram === "process-diagram-inj3" && (
+                      <div className="faq-diagram-card dark-theme alt-bg-2">
+                        <h4 className="faq-diagram-title">Pain and Suffering Settlement Calculation Process</h4>
+                        <div className="faq-diagram-flow">
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme">
+                              <span className="step-tag">Step 1: Determine Economic Damages</span>
+                              <p className="faq-step-subtext">Calculate medical expenses, lost income, and documented financial losses.</p>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme">
+                              <span className="step-tag">Step 2: Evaluate Injury Severity</span>
+                              <p className="faq-step-subtext">Assess recovery length and permanent impairment using medical evidence.</p>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme">
+                              <span className="step-tag">Step 3: Estimate Pain and Suffering Value</span>
+                              <p className="faq-step-subtext">Apply multiplier method or per diem method.</p>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme highlight">
+                              <span className="step-tag">Step 4: Final Settlement Determination</span>
+                              <p className="faq-step-subtext">Compare estimate with case facts, evidence, and negotiation factors.</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {isReadMore && item.diagram === "process-diagram-inj4" && (
+                      <div className="faq-diagram-card dark-theme alt-bg-2">
+                        <h4 className="faq-diagram-title">Slip and Fall Settlement Calculation Process</h4>
+                        <div className="faq-diagram-flow">
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme">
+                              <span>Calculate Economic Damages</span>
+                              <p className="faq-step-subtext">Sum of medical expenses and documented lost wages.</p>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme">
+                              <span>Apply Severity Multiplier</span>
+                              <p className="faq-step-subtext">Multiply economic damages by a severity factor.</p>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme">
+                              <span>Assess Premises Liability</span>
+                              <p className="faq-step-subtext">Evaluate maintenance records and hazard notice history.</p>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme diamond-shape">
+                              <span>Is Partial Responsibility Argued?</span>
+                              <p className="faq-step-subtext">Determine if property owner claims injured party fault.</p>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme">
+                              <span>Apply Comparative Fault Reduction</span>
+                              <p className="faq-step-subtext">Reduce settlement based on percentage of injured party fault.</p>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme rounded-oval highlight">
+                              <span>Final Settlement Amount</span>
+                              <p className="faq-step-subtext">The resulting value after all adjustments.</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {isReadMore && item.diagram === "process-diagram-inj5" && (
+                      <div className="faq-diagram-card dark-theme alt-bg-2">
+                        <h4 className="faq-diagram-title">Settlement Value Calculation Process</h4>
+                        <div className="faq-diagram-bracket-flow">
+                          <div className="faq-bracket-left-col">
+                            <div className="faq-step-box blue-theme">
+                              <div className="faq-step-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00b4d8" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><circle cx="10" cy="12" r="3"/><line x1="12" y1="14" x2="15" y2="17"/></svg>
+                              </div>
+                              <span>Review Case History</span>
+                            </div>
+                            <div className="faq-step-box blue-theme">
+                              <div className="faq-step-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00b4d8" strokeWidth="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/></svg>
+                              </div>
+                              <span>Total Economic Damages</span>
+                            </div>
+                            <div className="faq-step-box blue-theme">
+                              <div className="faq-step-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00b4d8" strokeWidth="2"><path d="m14 13 5 5M6 6l5 5M4 11l4-4M13 20l4-4M15 4l5 5"/></svg>
+                              </div>
+                              <span>Assess Negotiation Leverage</span>
+                            </div>
+                          </div>
+                          <div className="faq-bracket-symbol">
+                            <svg width="24" height="120" viewBox="0 0 24 120" fill="none" stroke="#00b4d8" strokeWidth="2.5">
+                              <path d="M4 6 C16 6, 16 35, 16 60 C16 85, 16 114, 4 114 M16 60 L24 60" strokeLinecap="round" />
+                            </svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme highlight">
+                              <div className="faq-step-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00b4d8" strokeWidth="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="8" y1="6" x2="16" y2="6"/><path d="M16 14h.01M12 14h.01M8 14h.01M12 18h.01M8 18h.01"/></svg>
+                              </div>
+                              <span>Calculate Settlement Value</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {isReadMore && item.diagram === "process-diagram-wc1" && (
+                      <div className="faq-diagram-card dark-theme alt-bg-2">
+                        <h4 className="faq-diagram-title">Workers Comp Settlement Calculation</h4>
+                        <div className="faq-diagram-flow">
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme">
+                              <span>Determine Weekly Wage</span>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme">
+                              <span>Assess Impairment Rating</span>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme">
+                              <span>Apply Benefit Schedule</span>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme highlight">
+                              <span>Settlement Figure</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {isReadMore && item.diagram === "process-diagram-wc2" && (
+                      <div className="faq-diagram-card dark-theme alt-bg-2">
+                        <h4 className="faq-diagram-title">Workers' Compensation Settlement Calculation Process</h4>
+                        <div className="faq-diagram-flow">
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box pink-theme">
+                              <div className="faq-step-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ec4899" strokeWidth="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/></svg>
+                              </div>
+                              <span className="step-tag pink-text">Step 1: Determine Benefits</span>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box pink-theme">
+                              <div className="faq-step-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ec4899" strokeWidth="2"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z"/></svg>
+                              </div>
+                              <span className="step-tag pink-text">Step 2: Gather Documentation</span>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box pink-theme">
+                              <div className="faq-step-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ec4899" strokeWidth="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                              </div>
+                              <span className="step-tag pink-text">Step 3: Evaluate Future Factors</span>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box pink-theme highlight">
+                              <div className="faq-step-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ec4899" strokeWidth="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                              </div>
+                              <span className="step-tag pink-text">Step 4: Compare and Decide</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {isReadMore && item.diagram === "process-diagram-wc3" && (
+                      <div className="faq-diagram-card dark-theme alt-bg-2">
+                        <h4 className="faq-diagram-title">Workers' Comp Settlement Calculation</h4>
+                        <div className="faq-diagram-flow">
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme">
+                              <span>Assess Wage History</span>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme">
+                              <span>Evaluate Injury</span>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme">
+                              <span>Apply State Law</span>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme">
+                              <span>Estimate Future Costs</span>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme highlight">
+                              <span>Calculate Settlement</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {isReadMore && item.diagram === "process-diagram-wc4" && (
+                      <div className="faq-diagram-card dark-theme alt-bg-2">
+                        <h4 className="faq-diagram-title">workers' Compensation Settlement Calculation Process</h4>
+                        <div className="faq-diagram-flow">
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme">
+                              <div className="faq-step-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00b4d8" strokeWidth="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/></svg>
+                              </div>
+                              <span>Identify Benefits</span>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme">
+                              <div className="faq-step-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00b4d8" strokeWidth="2"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z"/></svg>
+                              </div>
+                              <span>Gather Documentation</span>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme">
+                              <div className="faq-step-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00b4d8" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><circle cx="10" cy="12" r="3"/><line x1="12" y1="14" x2="15" y2="17"/></svg>
+                              </div>
+                              <span>Assess Case Factors</span>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme">
+                              <div className="faq-step-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00b4d8" strokeWidth="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="8" y1="6" x2="16" y2="6"/><path d="M16 14h.01M12 14h.01M8 14h.01M12 18h.01M8 18h.01"/></svg>
+                              </div>
+                              <span>Evaluate Settlement</span>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box diamond-shape highlight">
+                              <div className="faq-step-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f97316" strokeWidth="2"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/></svg>
+                              </div>
+                              <span>Decide on Resolution</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {isReadMore && item.diagram === "process-diagram-wc5" && (
+                      <div className="faq-diagram-card dark-theme alt-bg-2">
+                        <h4 className="faq-diagram-title">Calculate a California workers comp settlement</h4>
+                        <div className="faq-diagram-flow">
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme">
+                              <span>Determine disability rating</span>
+                              <p className="faq-step-subtext">Determine the permanent disability rating assigned after reaching maximum medical improvement.</p>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme">
+                              <span>Calculate disability benefits</span>
+                              <p className="faq-step-subtext">Calculate the permanent disability benefits using the applicable California benefit rate and the disability rating.</p>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme">
+                              <span>Consider additional factors</span>
+                              <p className="faq-step-subtext">Consider future medical care, temporary disability benefits, age, occupation, and apportionment.</p>
+                            </div>
+                          </div>
+                          <div className="faq-flow-arrow">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </div>
+                          <div className="faq-flow-step">
+                            <div className="faq-step-box blue-theme highlight">
+                              <span>Determine settlement resolution</span>
+                              <p className="faq-step-subtext">Determine whether the settlement will be resolved through a Compromise and Release or a Stipulated Award.</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
-            )}
-            {activeFaqTab === 1 && (
-              <div className="faq-answer-content">
-                <h3>Why does the calculator give a range?</h3>
-                <p>A range makes uncertainty visible. A single dollar result suggests a level of precision that a general-purpose calculator cannot support.</p>
-                <div className="takeaway-card">
-                  <strong>Key Takeaway:</strong>
-                  <p>A range models low-impact and high-impact scenarios to better prepare you for negotiation ranges.</p>
-                </div>
-              </div>
-            )}
-            {activeFaqTab === 2 && (
-              <div className="faq-answer-content">
-                <h3>How are pain and suffering damages estimated?</h3>
-                <p>The calculator applies a disclosed impact band to treatment costs for scenario planning. This multiplier is an educational shortcut, not a legal standard or a method that insurers, lawyers, judges, or juries must use.</p>
-                <div className="takeaway-card">
-                  <strong>Key Takeaway:</strong>
-                  <p>Multiplier bands (e.g. 1.5x–5x) are guidelines for organizing arguments, not fixed laws.</p>
-                </div>
-              </div>
-            )}
-            {activeFaqTab === 3 && (
-              <div className="faq-answer-content">
-                <h3>Does selecting a state apply that state’s settlement law?</h3>
-                <p>Not yet. The current state field provides context only. State-specific rule modules and cited legal sources are planned for later releases.</p>
-                <div className="takeaway-card">
-                  <strong>Key Takeaway:</strong>
-                  <p>Always verify local damage caps, negligence standards, and filing limits with a local attorney.</p>
-                </div>
-              </div>
-            )}
-          </div>
+            );
+          })}
         </div>
       </section>
 
