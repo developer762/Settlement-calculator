@@ -1610,11 +1610,11 @@ export default function Home() {
     const container = document.querySelector(".accident-tabs-nav-wrapper");
     const containerRect = container?.getBoundingClientRect();
     if (containerRect) {
-      const x = rect.left - containerRect.left + rect.width / 2;
+      const rawX = rect.left - containerRect.left + rect.width / 2;
       const y = rect.top - containerRect.top;
       const text = accidentTabsData[tabId]?.definition || "";
       const shortText = text.split(".")[0] + ".";
-      setActiveTooltip({ text: shortText, x, y });
+      setActiveTooltip({ text: shortText, x: rawX, y });
     }
   };
 

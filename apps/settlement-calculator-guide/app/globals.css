@@ -2555,10 +2555,25 @@ footer > div { display: flex; justify-content: flex-end; gap: 24px; font-size: 1
   }
 
   .tab-portal-tooltip {
-    max-width: calc(100vw - 32px) !important;
-    width: 230px !important;
+    display: block !important;
+    left: 50% !important;
+    transform: translate(-50%, -100%) !important;
+    width: calc(100vw - 32px) !important;
+    max-width: 290px !important;
     font-size: 11.5px !important;
     padding: 8px 12px !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  .tab-portal-tooltip-arrow {
+    left: 50% !important;
+  }
+
+  .stat-tooltip-bubble {
+    width: 200px !important;
+    right: 0 !important;
+    left: auto !important;
+    max-width: calc(100vw - 32px) !important;
   }
 
   /* Factors Section 320px - 600px Mobile Fixes */
