@@ -1603,6 +1603,7 @@ export default function Home() {
 
   // Collapsible cards state
   const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({});
+  const [expandedMethodSlides, setExpandedMethodSlides] = useState<Record<number, boolean>>({});
   const [activeTooltip, setActiveTooltip] = useState<{ text: string; x: number; y: number } | null>(null);
 
   const handleTabMouseEnter = (e: React.MouseEvent, tabId: string) => {
@@ -1785,7 +1786,7 @@ export default function Home() {
 
       <section className="hero" id="top" aria-labelledby="page-title">
         <div className="hero-copy">
-          <p className="eyebrow"><span>Independent methodology</span> · Updated July 2026</p>
+          <p className="eyebrow"><span className="eyebrow-tag">Independent methodology</span> <span className="eyebrow-dot">·</span> <span className="eyebrow-date">Updated July 2026</span></p>
           <h1 id="page-title">Personal Injury Settlement Calculator</h1>
           <p className="hero-lede">
             Use a personal injury settlement calculator that estimates compensation value tied to a filed injury claim through documented economic loss, pain and suffering impact, plus fault adjustment. Input fields collect medical expense total, lost wage amount, injury severity level, plus fault percentage connected to a specific incident.
@@ -1821,7 +1822,7 @@ export default function Home() {
             <div><strong>2</strong><span>range scenarios</span></div>
             <div><strong>0</strong><span>contact details required</span></div>
           </div>
-          <p className="byline">Concept and information architecture by <strong>Koray Tuğberk Gübür</strong></p>
+          <p className="byline">Concept and information architecture by <strong style={{ whiteSpace: "nowrap" }}>Koray Tuğberk Gübür</strong></p>
         </div>
 
         <SettlementCalculator />
@@ -2246,11 +2247,11 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Carousel Slider Slider Container */}
+        {/* Carousel Slider Container */}
         <div className="method-slider-container">
           <button 
             type="button" 
-            className="slider-nav-btn prev"
+            className="slider-nav-btn prev desktop-only"
             onClick={prevMethodSlide}
             aria-label="Previous step"
           >
@@ -2265,9 +2266,31 @@ export default function Home() {
               <h3>{methodologySlides[activeMethodSlide].title}</h3>
             </div>
             
-            <p className="method-slide-description">
-              {methodologySlides[activeMethodSlide].description}
-            </p>
+            {(() => {
+              const fullDesc = methodologySlides[activeMethodSlide].description;
+              const sentences = fullDesc.split(". ");
+              const shortDesc = sentences.slice(0, 2).join(". ") + (sentences.length > 2 ? "." : "");
+              const isExpanded = !!expandedMethodSlides[activeMethodSlide];
+
+              return (
+                <p className="method-slide-description">
+                  {isExpanded ? fullDesc : shortDesc}
+                  {sentences.length > 2 && (
+                    <>
+                      {" "}
+                      <button
+                        type="button"
+                        className="card-readmore-btn method-readmore-btn"
+                        onClick={() => setExpandedMethodSlides((prev) => ({ ...prev, [activeMethodSlide]: !prev[activeMethodSlide] }))}
+                        style={{ display: "inline-flex", alignItems: "center", marginLeft: "4px", marginTop: 0, verticalAlign: "middle" }}
+                      >
+                        {isExpanded ? "Read less ▴" : "Read more ▾"}
+                      </button>
+                    </>
+                  )}
+                </p>
+              );
+            })()}
 
             {/* Sub-Card Calculation Box */}
             <div className="method-slide-calc-box">
@@ -2289,7 +2312,7 @@ export default function Home() {
 
           <button 
             type="button" 
-            className="slider-nav-btn next"
+            className="slider-nav-btn next desktop-only"
             onClick={nextMethodSlide}
             aria-label="Next step"
           >
@@ -2297,17 +2320,37 @@ export default function Home() {
           </button>
         </div>
 
-        {/* Pagination Dots */}
-        <div className="slider-dots">
-          {methodologySlides.map((_, idx) => (
-            <button
-              key={idx}
-              type="button"
-              className={`slider-dot-btn ${activeMethodSlide === idx ? "active" : ""}`}
-              onClick={() => setActiveMethodSlide(idx)}
-              aria-label={`Go to step ${idx + 1}`}
-            />
-          ))}
+        {/* Pagination & Mobile Control Row */}
+        <div className="slider-controls-row">
+          <button 
+            type="button" 
+            className="slider-nav-btn prev mobile-only-btn"
+            onClick={prevMethodSlide}
+            aria-label="Previous step"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+
+          <div className="slider-dots">
+            {methodologySlides.map((_, idx) => (
+              <button
+                key={idx}
+                type="button"
+                className={`slider-dot-btn ${activeMethodSlide === idx ? "active" : ""}`}
+                onClick={() => setActiveMethodSlide(idx)}
+                aria-label={`Go to step ${idx + 1}`}
+              />
+            ))}
+          </div>
+
+          <button 
+            type="button" 
+            className="slider-nav-btn next mobile-only-btn"
+            onClick={nextMethodSlide}
+            aria-label="Next step"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
         </div>
       </section>
 
