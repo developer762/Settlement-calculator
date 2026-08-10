@@ -617,7 +617,8 @@ blockquote { margin: 0; font: 400 clamp(25px, 3vw, 39px)/1.18 var(--editorial); 
 .scope-layout { display: grid; grid-template-columns: 1.65fr .75fr; gap: 7vw; width: 100%; }
 .scope-card ol { list-style: none; margin: 0; padding: 0; border-top: 1px solid #3a466b; }
 .scope-card li { display: grid; grid-template-columns: 1.05fr .95fr; gap: 30px; padding: 18px 0; border-bottom: 1px solid #3a466b; }
-.scope-card li span { font: 750 16px/1.3 var(--display); }
+.scope-card li span,
+.scope-card li h3 { font: 750 16px/1.3 var(--display); margin: 0; color: inherit; display: inline-block; }
 .scope-card li small { color: #aeb7d3; line-height: 1.55; }
 .scope-aside { align-self: end; background: var(--signal); color: var(--ink); padding: 30px; transform: rotate(1.4deg); box-shadow: 14px 14px 0 var(--cobalt); }
 .scope-stamp { display: inline-block; border: 2px solid var(--ink); padding: 6px 8px; font: 900 10px/1 var(--display); letter-spacing: .14em; transform: rotate(-3deg); }

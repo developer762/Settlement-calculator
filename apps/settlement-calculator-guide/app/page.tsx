@@ -973,6 +973,7 @@ interface FaqItem {
   id: string;
   question: string;
   text: string;
+  tag?: "h2" | "h3" | "h4";
   listItems?: { label: string; content: string }[];
   diagram?: string & {};
   table?: FaqTable;
@@ -1153,7 +1154,7 @@ const faqCategoryData: FaqCategory[] = [
       {
         id: "def-5",
         question: "What Is a Settlement Demand Letter?",
-        text: "A settlement demand letter is a formal document presenting a requested compensation figure to an insurance carrier connected to a filed claim. The letter outlines liability argument, documented damage total, plus supporting evidence connected to the incident. A demand figure typically sits above the anticipated settlement value, allowing negotiation room toward a final agreed figure. Insurance carriers respond through a counteroffer, opening a negotiation exchange toward final resolution. Sutliff & Stout drafts demand letters supported through complete documentation connected to a filed claim."
+        text: "A settlement demand letter is a formal document presenting a requested compensation figure to an insurance carrier connected to a filed claim. The letter outlines liability argument, documented damage total, plus supporting evidence connected to the incident. A demand figure typically sits above the anticipated settlement value, allowing negotiation room toward a final agreed figure. Insurance carriers respond through a counteroffer, opening a negotiation exchange toward final resolution. Sutliff & Stout drafts demand letters supported through complete documentation connected to a filed claim. Suggested image alt tag: settlement demand letter template showing liability argument plus damage total sections."
       },
       {
         id: "def-6",
@@ -1186,6 +1187,7 @@ const faqCategoryData: FaqCategory[] = [
       {
         id: "con-4",
         question: "What Is Contributory Negligence?",
+        tag: "h4",
         text: "Contributory negligence is a stricter legal rule barring recovery entirely once an injured party carries any percentage of fault connected to an incident. A small number of jurisdictions retain this rule, contrasting against the comparative fault approach applied within Texas. Under contributory negligence, even minimal fault assigned toward an injured party eliminates compensation regardless of the other party's greater fault share. Texas does not apply contributory negligence, applying a modified comparative rule instead."
       },
       {
@@ -1262,6 +1264,7 @@ const faqCategoryData: FaqCategory[] = [
       {
         id: "req-4",
         question: "Do I Need a Police Report to Calculate My Settlement?",
+        tag: "h4",
         text: "Yes, a police report supports settlement calculation through documented fault determination plus incident detail confirmed at the scene. A police report records vehicle position, damage extent, plus witness statements gathered immediately following a collision. Insurance carriers weigh police report content heavily during liability determination connected to a filed claim. Absent a police report, liability proof relies more heavily on photograph evidence, witness statements, plus physical damage assessment gathered independently. Sutliff & Stout requests a police report copy early within a filed claim connected to liability proof."
       },
       {
@@ -1272,6 +1275,7 @@ const faqCategoryData: FaqCategory[] = [
       {
         id: "req-6",
         question: "Do I Need a Lawyer to Calculate My Settlement Value?",
+        tag: "h4",
         text: "No, you do not need a lawyer to calculate your settlement value, but legal representation helps produce a more accurate estimate based on the specific facts of your case. A settlement calculator provides a general estimate using standard inputs but cannot account for case-specific factors such as disputed liability, insurance coverage limits, future damages, or the strength of the available evidence. A lawyer evaluates those factors to determine the full value of a claim and develop an effective negotiation strategy. Complex claims involving severe injuries, disputed fault, or multiple insurance policies benefit significantly from a professional legal review before a settlement demand is made. Sutliff & Stout offers free consultations to review the facts of a case and explain the factors that may affect its potential value."
       }
     ]
@@ -1318,6 +1322,7 @@ const faqCategoryData: FaqCategory[] = [
       {
         id: "fact-4",
         question: "Do Pre-Existing Conditions Lower My Settlement Amount?",
+        tag: "h4",
         text: "Yes, a pre-existing condition can lower settlement amount once an insurer argues current symptoms predate the incident rather than resulting from it. Medical documentation distinguishing aggravation from origin protects value tied to the specific incident. A previously stable condition worsened through a new incident still supports compensation tied to the aggravation itself. Absent clear distinguishing documentation, an insurer often discounts value tied toward the disputed portion of the injury. Sutliff & Stout gathers prior medical record comparisons to isolate aggravation value connected to a filed claim."
       },
       {
@@ -1328,6 +1333,7 @@ const faqCategoryData: FaqCategory[] = [
       {
         id: "fact-6",
         question: "Does the State I Live In Change My Settlement Value?",
+        tag: "h4",
         text: "Yes, the governing state changes settlement value through comparative fault threshold, damage cap application, plus filing deadline specific to that jurisdiction. A state applying a strict fault threshold bars recovery sooner compared to a state applying a more lenient threshold. A state applying a damage cap toward non-economic loss limits recovery regardless of injury severity within specific claim categories. Filing deadline variance across state law shifts urgency connected to evidence gathering plus claim submission timing. Sutliff & Stout applies Texas-specific statute knowledge toward every filed claim reviewed across Houston."
       }
     ]
@@ -1370,6 +1376,7 @@ const faqCategoryData: FaqCategory[] = [
       {
         id: "cost-4",
         question: "Is a Personal Injury Settlement Taxable?",
+        tag: "h4",
         text: "No, compensation connected to physical injury within a personal injury settlement remains non-taxable under federal tax law under standard circumstances. Compensatory damages covering medical expenses plus physical injury impacts fall outside taxable income under federal statute. Punitive damage awards plus interest accrued during litigation remain taxable regardless of the underlying claim type. Emotional distress compensation absent an accompanying physical injury can carry taxable treatment under specific circumstances. Sutliff & Stout reviews settlement structure toward minimizing taxable exposure before finalizing a final agreement."
       },
       {
@@ -1413,11 +1420,13 @@ const faqCategoryData: FaqCategory[] = [
       {
         id: "time-5",
         question: "Does Going to Trial Make the Payout Take Longer?",
+        tag: "h4",
         text: "Yes, proceeding toward trial extends payout timing considerably compared to a claim resolved through negotiation. Court scheduling, discovery exchange, plus trial preparation each add process steps absent in a negotiated resolution. A jury verdict can also trigger a post-trial appeal period further delaying final payout. Settlement negotiation avoids this extended timeline, often resolving within a shorter window compared to litigation. Sutliff & Stout weighs timeline impact alongside value potential before recommending trial pursuit connected to a filed claim."
       },
       {
         id: "time-6",
         question: "Can I Calculate My Settlement Before Treatment Is Finished?",
+        tag: "h4",
         text: "Yes, an early settlement calculation remains possible before treatment finishes, though accuracy improves once treatment reaches a stable endpoint. An early calculation relies on projected treatment cost plus anticipated recovery duration absent a final medical release. Accepting a final settlement before treatment completion risks undervaluing ongoing or future medical need. Waiting toward maximum medical improvement typically produces a more accurate final calculation supported through complete documentation. Sutliff & Stout balances early expectation setting alongside a recommendation toward waiting before finalizing a demand figure."
       }
     ]
@@ -2879,7 +2888,7 @@ export default function Home() {
                 style={{ cursor: "pointer" }}
               >
                 <span style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
-                  <span>Is Every Loss Supported by a Record?</span>
+                  <h3>Is Every Loss Supported by a Record?</h3>
                   <span style={{ color: "var(--signal)", font: "900 20px var(--display)", transition: "transform 0.2s" }}>
                     {activeScopeItem === 0 ? "−" : "+"}
                   </span>
@@ -2905,7 +2914,7 @@ export default function Home() {
                 style={{ cursor: "pointer" }}
               >
                 <span style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
-                  <span>Which Facts Could Weaken Causation?</span>
+                  <h3>Which Facts Could Weaken Causation?</h3>
                   <span style={{ color: "var(--signal)", font: "900 20px var(--display)", transition: "transform 0.2s" }}>
                     {activeScopeItem === 1 ? "−" : "+"}
                   </span>
@@ -2934,7 +2943,7 @@ export default function Home() {
                 style={{ cursor: "pointer" }}
               >
                 <span style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
-                  <span>What Does Local Law Change?</span>
+                  <h3>What Does Local Law Change?</h3>
                   <span style={{ color: "var(--signal)", font: "900 20px var(--display)", transition: "transform 0.2s" }}>
                     {activeScopeItem === 2 ? "−" : "+"}
                   </span>
@@ -2960,7 +2969,7 @@ export default function Home() {
                 style={{ cursor: "pointer" }}
               >
                 <span style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
-                  <span>What Coverage Is Actually Available?</span>
+                  <h3>What Coverage Is Actually Available?</h3>
                   <span style={{ color: "var(--signal)", font: "900 20px var(--display)", transition: "transform 0.2s" }}>
                     {activeScopeItem === 3 ? "−" : "+"}
                   </span>
@@ -2996,11 +3005,11 @@ export default function Home() {
           <h2 id="states-heading">Personal injury settlement calculators by state</h2>
           <p style={{ maxWidth: "800px", margin: "20px auto 0", lineHeight: "1.65" }}>
             Personal injury settlement calculators by state adjust output based on comparative fault threshold, damage cap application, plus filing deadline specific toward a chosen jurisdiction.
-            {!isStatesDescExpanded && "..."}
+            {!isStatesDescExpanded && " "}
             {isStatesDescExpanded && (
               <>
                 {" "}
-                State selection changes multiplier range application once local damage cap rules apply toward non economic loss. Filing deadline variance across state law shifts urgency connected to a pending claim nearing a statutory cutoff. Local city data connected to a chosen state supports venue specific expectation setting relevant toward settlement negotiation. Sutliff & Stout builds state specific calculator logic around jurisdiction law reviewed across a filed claim.
+                State selection changes multiplier range application once local damage cap rules apply toward non economic loss. Filing deadline variance across state law shifts urgency connected to a pending claim nearing a statutory cutoff. Local city data connected to a chosen state supports venue specific expectation setting relevant toward settlement negotiation. Sutliff & Stout builds state specific calculator logic around jurisdiction law reviewed across a filed claim.{" "}
               </>
             )}
             <button
@@ -3008,7 +3017,7 @@ export default function Home() {
               className="card-readmore-btn"
               onClick={() => setIsStatesDescExpanded(!isStatesDescExpanded)}
               aria-expanded={isStatesDescExpanded}
-              style={{ display: "inline-flex", marginLeft: "6px", verticalAlign: "baseline" }}
+              style={{ display: "inline-flex", alignItems: "center", marginLeft: "4px", marginTop: 0, verticalAlign: "middle" }}
             >
               {isStatesDescExpanded ? "Read less" : "Read more"}
               <svg 
@@ -3265,7 +3274,9 @@ export default function Home() {
                   onClick={() => toggleFaqAccordion(item.id)}
                   aria-expanded={isOpen}
                 >
-                  {idx === 0 ? (
+                  {item.tag === "h4" ? (
+                    <h4>{item.question}</h4>
+                  ) : item.tag === "h2" || (idx === 0 && !item.tag) ? (
                     <h2>{item.question}</h2>
                   ) : (
                     <h3>{item.question}</h3>
@@ -3278,16 +3289,6 @@ export default function Home() {
                     <p className="faq-preview-text">
                       {isReadMore ? item.text : previewText}
                     </p>
-
-                    {(item.text.length > previewText.length || item.table || item.listItems || item.diagram) && (
-                      <button
-                        type="button"
-                        className="faq-readmore-btn"
-                        onClick={(e) => toggleFaqReadMore(item.id, e)}
-                      >
-                        {isReadMore ? "Read less ▴" : "Read more ▾"}
-                      </button>
-                    )}
 
                     {/* Responsive Table rendering for items with table data */}
                     {isReadMore && item.table && (
@@ -3986,6 +3987,16 @@ export default function Home() {
                           </div>
                         </div>
                       </div>
+                    )}
+
+                    {(item.text.length > previewText.length || item.table || item.listItems || item.diagram) && (
+                      <button
+                        type="button"
+                        className="faq-readmore-btn"
+                        onClick={(e) => toggleFaqReadMore(item.id, e)}
+                      >
+                        {isReadMore ? "Read less ▴" : "Read more ▾"}
+                      </button>
                     )}
                   </div>
                 )}
